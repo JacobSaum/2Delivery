@@ -136,16 +136,16 @@ while run:
         player_car.move_forward()
         moved = True
         
-    # S
+    # S key is pressed
     if keys[pygame.K_s]:
         player_car.move_backward()
         moved = True
 
-    # A
+    # Akey is pressed
     if keys[pygame.K_a]:
         player_car.rotate(left = True)
 
-    # D
+    # Dkey is pressed
     if keys[pygame.K_d]:
         player_car.rotate(right = True)
     
