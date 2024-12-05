@@ -15,12 +15,14 @@ from Functions import blit_rotate_centre
 
 # Import map image
 MAP = scale_image(pygame.image.load("imgs/MainMap.png"), 0.3)
+MAP_COLLISIONS = scale_image(pygame.image.load("imgs/CollisionMap.png"), 0.3)
+MAP_COLLISIONS_MASK = pygame.mask.from_surface(MAP_COLLISIONS)
 
 # Import veicle images 
 MOPED = scale_image(pygame.image.load("imgs/RedMoped.png"), 0.015)
 PICKUP = scale_image(pygame.image.load("imgs/OrangePickup.png"), 0.015)
 VAN = scale_image(pygame.image.load("imgs/BlueVan.png"), 0.015)
-LORRY = scale_image(pygame.image.load("imgs/GreenLorry.png"), 0.015)
+LORRY = scale_image(pygame.image.load("imgs/GreenLorry.png"), 0.01)
 UFO = scale_image(pygame.image.load("imgs/Ufo.png"), 0.015)
 
 # -- ANIMATIONS --
@@ -73,14 +75,23 @@ class AbstractCar:
         self.y -= vertical
         self.x -= horizontal
 
+    def collide(self, mask, x=0, y=0):
+        car_mask = pygame.mask.from_surface(self.img)
+        offset = (int(self.x - x), int(self.y - y))
+        poi = mask.overlap(car_mask, offset)
+        return poi
+
     def reduce_speed(self):
         self.vel = max(self.vel - self.acceleration / 2, 0)
         self.move()
 
 class playerCar(AbstractCar):
     IMG = carSelection
-    START_POS = (550,550)
+    START_POS = (150,500)
 
+    def bounce(self):
+        self.vel = -0.5 * self.vel
+        self.move()
 
 def draw(win, images, player_car):
     for img,pos in images:
@@ -88,6 +99,8 @@ def draw(win, images, player_car):
 
         player_car.draw(win)
         pygame.display.update()
+
+    
 
 
 # -- CLOCK --
@@ -124,6 +137,9 @@ while run:
         if event.type == pygame.QUIT:
             run = False
             break
+
+    if player_car.collide(MAP_COLLISIONS_MASK) != None:
+        player_car.bounce()
             
 
     # -- KEY PRESSES --
