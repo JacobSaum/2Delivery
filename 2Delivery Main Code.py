@@ -127,7 +127,7 @@ while run:
     # -- DISPLAY IMAGES --
 
     draw(WIN, images, player_car)
-    
+
     # -- EVENT LOOP --
 
     for event in pygame.event.get():
@@ -157,15 +157,15 @@ while run:
         player_car.move_backward()
         moved = True
 
-    # Akey is pressed
-    if keys[pygame.K_a]:
-        player_car.rotate(left = True)
+    # A key is pressed
+    if keys[pygame.K_a] and player_car.vel != 0:
+        player_car.rotate(left=True)
 
-    # Dkey is pressed
-    if keys[pygame.K_d]:
-        player_car.rotate(right = True)
+    # D key is pressed
+    if keys[pygame.K_d] and player_car.vel != 0:
+        player_car.rotate(right=True)
     
-    # NO CLICK
+    # no key is pressed
     if not moved:
         player_car.reduce_speed()
    
