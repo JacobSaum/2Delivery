@@ -15,15 +15,15 @@ from Functions import blit_rotate_centre
 
 # Import map image
 MAP = scale_image(pygame.image.load("imgs/MainMap.png"), 0.3)
-MAP_COLLISIONS = scale_image(pygame.image.load("imgs/CollisionMap.png"), 0.3)
+MAP_COLLISIONS = scale_image(pygame.image.load("imgs/CollisionMap.png"), 3)
 MAP_COLLISIONS_MASK = pygame.mask.from_surface(MAP_COLLISIONS)
 
 # Import veicle images 
-MOPED = scale_image(pygame.image.load("imgs/RedMoped.png"), 0.015)
-PICKUP = scale_image(pygame.image.load("imgs/OrangePickup.png"), 0.015)
-VAN = scale_image(pygame.image.load("imgs/BlueVan.png"), 0.015)
+MOPED = scale_image(pygame.image.load("imgs/RedMoped.png"), 0.01)
+PICKUP = scale_image(pygame.image.load("imgs/OrangePickup.png"), 0.01)
+VAN = scale_image(pygame.image.load("imgs/BlueVan.png"), 0.01)
 LORRY = scale_image(pygame.image.load("imgs/GreenLorry.png"), 0.01)
-UFO = scale_image(pygame.image.load("imgs/Ufo.png"), 0.015)
+UFO = scale_image(pygame.image.load("imgs/Ufo.png"), 0.01)
 
 # -- ANIMATIONS --
 
@@ -35,7 +35,7 @@ pygame.display.set_caption("2Delivery")
 # ------------------- MAIN CODE -------------------
 
 # -- TEMP CODE --
-carSelection = LORRY
+carSelection = VAN
 
 # -- CLASSES --
 
@@ -127,7 +127,7 @@ while run:
     # -- DISPLAY IMAGES --
 
     draw(WIN, images, player_car)
-   
+    
     # -- EVENT LOOP --
 
     for event in pygame.event.get():
