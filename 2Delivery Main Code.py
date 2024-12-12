@@ -168,5 +168,9 @@ while run:
     # no key is pressed
     if not moved:
         player_car.reduce_speed()
+    
+    #if esc key is pressed
+    if keys[pygame.K_ESCAPE]:
+        pygame.quit()
    
 pygame.quit()
