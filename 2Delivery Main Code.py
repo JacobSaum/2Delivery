@@ -4,6 +4,7 @@ import pygame
 import time
 import random
 import math
+import csv
 pygame.init()
 
 
@@ -51,7 +52,7 @@ class AbstractCar:
         self.x, self.y = self.START_POS
         self.acceleration = 0.1
 
-    def rotate(self, left = False, right = False):
+    def rotate(self, left=False, right=False):
         if left:
             self.angle += self.rotation_vel
         elif right:
@@ -86,7 +87,7 @@ class AbstractCar:
         self.vel = max(self.vel - self.acceleration / 2, 0)
         self.move()
 
-class playerCar(AbstractCar):
+class playerCar(AbstractCar):   
     IMG = carSelection
     START_POS = (150,500)
 
@@ -173,5 +174,11 @@ while run:
     #if esc key is pressed
     if keys[pygame.K_ESCAPE]:
         pygame.quit()
+
+    def handle_collision(player_car):
+        if player_car.collide(MAP_COLLISIONS_MASK) != None:
+            player_car.bounce()
+
+    handle_collision(player_car)
    
 pygame.quit()
