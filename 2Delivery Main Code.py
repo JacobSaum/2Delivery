@@ -27,9 +27,13 @@ PICKUP = scale_image(pygame.image.load("imgs/OrangePickup.png"), 0.01)
 VAN = scale_image(pygame.image.load("imgs/BlueVan.png"), 0.01)
 LORRY = scale_image(pygame.image.load("imgs/GreenLorry.png"), 0.01)
 UFO = scale_image(pygame.image.load("imgs/Ufo.png"), 0.01)
+
 COINS_UI = scale_image(pygame.image.load("imgs/CoinsUI.png"), 0.03)
 PARCEL_UI = scale_image(pygame.image.load("imgs/ParcelUI.png"), 0.03)
 SPEED_UI = scale_image(pygame.image.load("imgs/SpeedUI.png"),0.02)
+
+MAINMENU = scale_image(pygame.image.load("imgs/MainMenuScreen.png"),0.13)
+
 
 # Import Fonts
 UI_FONT = pygame.font.Font("Fonts/PixelifySans-SemiBold.ttf", 44)
@@ -47,6 +51,14 @@ pygame.display.set_caption("2Delivery")
 carSelection = MOPED
 
 # -- CLASSES --
+
+class GameInfo:
+    def __init__(self):
+        self.started = False
+    
+    def start_game(self):
+        self.started = True
+
 
 class AbstractCar:
 
@@ -107,7 +119,7 @@ def draw(win, images, uiimages, player_car):
         win.blit(img, pos)
 
     player_car.draw(win)
-    
+
     for img,pos in uiimages:
         win.blit(img, pos)
 
@@ -115,8 +127,6 @@ def draw(win, images, uiimages, player_car):
     pygame.display.update()
 
     
-
-
 # -- CLOCK --
 
 FPS = 60
@@ -130,6 +140,11 @@ uiImages = [(PARCEL_UI, (15,15)), (SPEED_UI, (15,915)), (COINS_UI, (15,200))]
 # -- PLAYER CAR --
 
 player_car = playerCar(4,4)
+gameInfo = GameInfo()
+
+# -- KEY PRESSES --
+
+keys = pygame.key.get_pressed()
 
 # -- EVENT LOOP --
 
@@ -142,6 +157,21 @@ while run:
     # -- DISPLAY IMAGES --
 
     draw(WIN, images, uiImages, player_car)
+
+    while not gameInfo.started:
+        WIN.blit(MAINMENU, (0,0))
+        pygame.display.update()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                break
+            
+            if event.type == pygame.KEYDOWN:
+                gameInfo.start_game()
+
+
+
+
 
     # -- EVENT LOOP --
 
@@ -157,9 +187,7 @@ while run:
         player_car.bounce()
             
 
-    # -- KEY PRESSES --
-
-    keys = pygame.key.get_pressed()
+    
 
     moved = False
     # W key is pressed
@@ -188,10 +216,4 @@ while run:
     if keys[pygame.K_ESCAPE]:
         pygame.quit()
 
-    #def handle_collision(player_car):
-        #if player_car.collide(MAP_COLLISIONS_MASK) != None:
-            #player_car.bounce()
-
-    #handle_collision(player_car)
-   
 pygame.quit()
