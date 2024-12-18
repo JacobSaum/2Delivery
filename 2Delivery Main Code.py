@@ -6,6 +6,7 @@ import random
 import math
 import csv
 pygame.init()
+pygame.font.init()
 
 
 from Functions import scale_image
@@ -26,6 +27,12 @@ PICKUP = scale_image(pygame.image.load("imgs/OrangePickup.png"), 0.01)
 VAN = scale_image(pygame.image.load("imgs/BlueVan.png"), 0.01)
 LORRY = scale_image(pygame.image.load("imgs/GreenLorry.png"), 0.01)
 UFO = scale_image(pygame.image.load("imgs/Ufo.png"), 0.01)
+COINS_UI = scale_image(pygame.image.load("imgs/CoinsUI.png"), 0.03)
+PARCEL_UI = scale_image(pygame.image.load("imgs/ParcelUI.png"), 0.03)
+SPEED_UI = scale_image(pygame.image.load("imgs/SpeedUI.png"),0.02)
+
+# Import Fonts
+UI_FONT = pygame.font.Font("Fonts/PixelifySans-SemiBold.ttf", 44)
 
 # -- ANIMATIONS --
 
@@ -37,7 +44,7 @@ pygame.display.set_caption("2Delivery")
 # ------------------- MAIN CODE -------------------
 
 # -- TEMP CODE --
-carSelection = VAN
+carSelection = MOPED
 
 # -- CLASSES --
 
@@ -95,12 +102,17 @@ class playerCar(AbstractCar):
         self.vel = -0.5 * self.vel
         self.move()
 
-def draw(win, images, player_car):
+def draw(win, images, uiimages, player_car):
     for img,pos in images:
         win.blit(img, pos)
 
-        player_car.draw(win)
-        pygame.display.update()
+    player_car.draw(win)
+    
+    for img,pos in uiimages:
+        win.blit(img, pos)
+
+    
+    pygame.display.update()
 
     
 
@@ -113,6 +125,7 @@ clock = pygame.time.Clock()
 # -- IMAGES --
 
 images = [(MAP, (0,0))]
+uiImages = [(PARCEL_UI, (15,15)), (SPEED_UI, (15,915)), (COINS_UI, (15,200))]
 
 # -- PLAYER CAR --
 
@@ -128,7 +141,7 @@ while run:
 
     # -- DISPLAY IMAGES --
 
-    draw(WIN, images, player_car)
+    draw(WIN, images, uiImages, player_car)
 
     # -- EVENT LOOP --
 
@@ -175,10 +188,10 @@ while run:
     if keys[pygame.K_ESCAPE]:
         pygame.quit()
 
-    def handle_collision(player_car):
-        if player_car.collide(MAP_COLLISIONS_MASK) != None:
-            player_car.bounce()
+    #def handle_collision(player_car):
+        #if player_car.collide(MAP_COLLISIONS_MASK) != None:
+            #player_car.bounce()
 
-    handle_collision(player_car)
+    #handle_collision(player_car)
    
 pygame.quit()
