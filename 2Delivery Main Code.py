@@ -28,12 +28,15 @@ VAN = scale_image(pygame.image.load("imgs/BlueVan.png"), 0.01)
 LORRY = scale_image(pygame.image.load("imgs/GreenLorry.png"), 0.01)
 UFO = scale_image(pygame.image.load("imgs/Ufo.png"), 0.01)
 
+# Import User Interface Images
 COINS_UI = scale_image(pygame.image.load("imgs/CoinsUI.png"), 0.03)
 PARCEL_UI = scale_image(pygame.image.load("imgs/ParcelUI.png"), 0.03)
 SPEED_UI = scale_image(pygame.image.load("imgs/SpeedUI.png"),0.02)
 
 MAINMENU = scale_image(pygame.image.load("imgs/MainMenuScreen.png"),0.13)
 
+PLAY_BUTTON = scale_image(pygame.image.load("imgs/PlayButton.png"), 0.019)
+PLAY_BUTTON_PRESSED = scale_image(pygame.image.load("imgs/PlayButtonPRESSED.png"), 0.036)
 
 # Import Fonts
 UI_FONT = pygame.font.Font("Fonts/PixelifySans-SemiBold.ttf", 44)
@@ -58,6 +61,16 @@ class GameInfo:
     
     def start_game(self):
         self.started = True
+
+class Button:
+    def __init__(self, x, y, image):
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.rect.topleft = (x,y)
+
+    def drawButton(self):
+        WIN.blit(self.image, (self.rect.x, self.rect.y))
+        
 
 
 class AbstractCar:
@@ -123,6 +136,10 @@ def draw(win, images, uiimages, player_car):
     for img,pos in uiimages:
         win.blit(img, pos)
 
+def drawMenu(win, menuImages):
+    for img,pos in menuImages:
+        win.blit(img, pos)
+
     
     pygame.display.update()
 
@@ -137,6 +154,9 @@ clock = pygame.time.Clock()
 images = [(MAP, (0,0))]
 uiImages = [(PARCEL_UI, (15,15)), (SPEED_UI, (15,915)), (COINS_UI, (15,200))]
 
+menuImages = [(MAINMENU, (0,0)), (PLAY_BUTTON, (575,625))]
+#, (PLAY_BUTTON, (500,500))
+
 # -- PLAYER CAR --
 
 player_car = playerCar(4,4)
@@ -145,6 +165,9 @@ gameInfo = GameInfo()
 # -- KEY PRESSES --
 
 keys = pygame.key.get_pressed()
+
+
+
 
 # -- EVENT LOOP --
 
@@ -159,11 +182,12 @@ while run:
     draw(WIN, images, uiImages, player_car)
 
     while not gameInfo.started:
-        WIN.blit(MAINMENU, (0,0))
+        drawMenu(WIN, menuImages)
         pygame.display.update()
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
+                run = False
                 break
             
             if event.type == pygame.KEYDOWN:
@@ -190,6 +214,11 @@ while run:
     
 
     moved = False
+    
+    #if esc key is pressed
+    if keys[pygame.K_ESCAPE]:
+        pygame.quit()
+
     # W key is pressed
     if keys[pygame.K_w]:
         player_car.move_forward()
@@ -211,9 +240,10 @@ while run:
     # no key is pressed
     if not moved:
         player_car.reduce_speed()
-    
+
+     
     #if esc key is pressed
     if keys[pygame.K_ESCAPE]:
-        pygame.quit()
-
+        run = False  
+   
 pygame.quit()
