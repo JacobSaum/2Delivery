@@ -7,6 +7,8 @@ import math
 import csv
 pygame.init()
 pygame.font.init()
+pygame.mixer.init()
+
 
 
 from Functions import scale_image
@@ -44,6 +46,7 @@ UI_FONT = pygame.font.Font("Fonts/PixelifySans-SemiBold.ttf", 44)
 # -- ANIMATIONS --
 
 # -- SOUNDS --
+MENU_SONG = pygame.mixer.music.load("imgs/Menu Music.mp3")
 
 WIN = pygame.display.set_mode((1280,1024))
 pygame.display.set_caption("2Delivery")
@@ -62,15 +65,29 @@ class GameInfo:
     def start_game(self):
         self.started = True
 
-class Button:
+class Button():
     def __init__(self, x, y, image):
         self.image = image
         self.rect = self.image.get_rect()
         self.rect.topleft = (x,y)
+        self.clicked = False
 
     def drawButton(self):
+        action = False
+
+        mousePos = pygame.mouse.get_pos()
+
+        if self.rect.collidepoint(mousePos):
+            if pygame.mouse.get_pressed()[0] == 1:
+                print("CLICKED")
+                action = True
+                
+
+
         WIN.blit(self.image, (self.rect.x, self.rect.y))
-        
+        pygame.display.update()
+
+        return action
 
 
 class AbstractCar:
@@ -154,20 +171,17 @@ clock = pygame.time.Clock()
 images = [(MAP, (0,0))]
 uiImages = [(PARCEL_UI, (15,15)), (SPEED_UI, (15,915)), (COINS_UI, (15,200))]
 
-menuImages = [(MAINMENU, (0,0)), (PLAY_BUTTON, (575,625))]
-#, (PLAY_BUTTON, (500,500))
+menuImages = [(MAINMENU, (0,0))]
 
 # -- PLAYER CAR --
 
 player_car = playerCar(4,4)
 gameInfo = GameInfo()
+play_button = Button(575, 625, PLAY_BUTTON)
 
 # -- KEY PRESSES --
 
 keys = pygame.key.get_pressed()
-
-
-
 
 # -- EVENT LOOP --
 
@@ -181,22 +195,20 @@ while run:
 
     draw(WIN, images, uiImages, player_car)
 
+    # Game not started
+
     while not gameInfo.started:
         drawMenu(WIN, menuImages)
-        pygame.display.update()
 
+        if play_button.drawButton() == True:
+            gameInfo.start_game()
+        
         for event in pygame.event.get():
+
             if event.type == pygame.QUIT:
                 run = False
                 break
             
-            if event.type == pygame.KEYDOWN:
-                gameInfo.start_game()
-
-
-
-
-
     # -- EVENT LOOP --
 
     for event in pygame.event.get():
