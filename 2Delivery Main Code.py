@@ -19,26 +19,27 @@ from Functions import blit_rotate_centre
 #------------------- FILE LOADING -------------------
 
 # Import map image
-MAP = scale_image(pygame.image.load("imgs/MainMap.png"), 0.3)
-MAP_COLLISIONS = scale_image(pygame.image.load("imgs/CollisionMap.png"), 3)
+MAP = scale_image(pygame.image.load("imgs/MainMap.png"), 0.103)
+MAP_COLLISIONS = scale_image(pygame.image.load("imgs/CollisionMap.png"), 0.103)
 MAP_COLLISIONS_MASK = pygame.mask.from_surface(MAP_COLLISIONS)
 
 # Import veicle images 
-MOPED = scale_image(pygame.image.load("imgs/RedMoped.png"), 0.01)
-PICKUP = scale_image(pygame.image.load("imgs/OrangePickup.png"), 0.01)
-VAN = scale_image(pygame.image.load("imgs/BlueVan.png"), 0.01)
-LORRY = scale_image(pygame.image.load("imgs/GreenLorry.png"), 0.01)
-UFO = scale_image(pygame.image.load("imgs/Ufo.png"), 0.01)
+MOPED = scale_image(pygame.image.load("imgs/RedMoped.png"), 0.005)
+PICKUP = scale_image(pygame.image.load("imgs/OrangePickup.png"), 0.005)
+VAN = scale_image(pygame.image.load("imgs/BlueVan.png"), 0.004)
+LORRY = scale_image(pygame.image.load("imgs/GreenLorry.png"), 0.005)
+UFO = scale_image(pygame.image.load("imgs/Ufo.png"), 0.005)
 
 # Import User Interface Images
-COINS_UI = scale_image(pygame.image.load("imgs/CoinsUI.png"), 0.03)
-PARCEL_UI = scale_image(pygame.image.load("imgs/ParcelUI.png"), 0.03)
-SPEED_UI = scale_image(pygame.image.load("imgs/SpeedUI.png"),0.02)
+COINS_UI = scale_image(pygame.image.load("imgs/CoinsUI.png"), 0.018)
+PARCEL_UI = scale_image(pygame.image.load("imgs/ParcelUI.png"), 0.018)
+SPEED_UI = scale_image(pygame.image.load("imgs/SpeedUI.png"),0.014)
+UIBACKGROUND = scale_image(pygame.image.load("imgs/UI BG.png"), 0.129)
+GAMELOGO = scale_image(pygame.image.load("imgs/2Delivery Logo.png"), 0.02)
 
 MAINMENU = scale_image(pygame.image.load("imgs/MainMenuScreen.png"),0.13)
 
 PLAY_BUTTON = scale_image(pygame.image.load("imgs/PlayButton.png"), 0.019)
-PLAY_BUTTON_PRESSED = scale_image(pygame.image.load("imgs/PlayButtonPRESSED.png"), 0.036)
 
 # Import Fonts
 UI_FONT = pygame.font.Font("Fonts/PixelifySans-SemiBold.ttf", 44)
@@ -54,7 +55,7 @@ pygame.display.set_caption("2Delivery")
 # ------------------- MAIN CODE -------------------
 
 # -- TEMP CODE --
-carSelection = MOPED
+carSelection = VAN
 
 # -- CLASSES --
 
@@ -73,6 +74,13 @@ class Button():
         self.clicked = False
 
     def drawButton(self):
+
+        WIN.blit(self.image, (self.rect.x, self.rect.y))
+        pygame.display.update()
+
+        
+    
+    def clickButton(self):
         action = False
 
         mousePos = pygame.mouse.get_pos()
@@ -81,11 +89,6 @@ class Button():
             if pygame.mouse.get_pressed()[0] == 1:
                 print("CLICKED")
                 action = True
-                
-
-
-        WIN.blit(self.image, (self.rect.x, self.rect.y))
-        pygame.display.update()
 
         return action
 
@@ -138,7 +141,7 @@ class AbstractCar:
 
 class playerCar(AbstractCar):   
     IMG = carSelection
-    START_POS = (150,500)
+    START_POS = (663, 700)
 
     def bounce(self):
         self.vel = -0.5 * self.vel
@@ -161,15 +164,16 @@ def drawMenu(win, menuImages):
     pygame.display.update()
 
     
-# -- CLOCK --
+# -- CLOCK -- 
 
 FPS = 60
 clock = pygame.time.Clock()
 
 # -- IMAGES --
 
-images = [(MAP, (0,0))]
-uiImages = [(PARCEL_UI, (15,15)), (SPEED_UI, (15,915)), (COINS_UI, (15,200))]
+images = [(UIBACKGROUND, (0,0)), (MAP, (0,0))]
+uiImages = [(PARCEL_UI, (1065,110)), (SPEED_UI, (1080,370)), (COINS_UI, (1065,240)), 
+            (GAMELOGO, (1057, 45))]
 
 menuImages = [(MAINMENU, (0,0))]
 
@@ -193,69 +197,65 @@ while run:
 
     # -- DISPLAY IMAGES --
 
-    draw(WIN, images, uiImages, player_car)
-
     # Game not started
 
     while not gameInfo.started:
         drawMenu(WIN, menuImages)
+        play_button.drawButton()
 
-        if play_button.drawButton() == True:
-            gameInfo.start_game()
-        
         for event in pygame.event.get():
 
             if event.type == pygame.QUIT:
-                run = False
+                pygame.quit()
                 break
-            
-    # -- EVENT LOOP --
 
+            if play_button.clickButton() == True:
+               gameInfo.start_game()
+               break
+
+    # game started - update screen
+    draw(WIN, images, uiImages, player_car)
+    pygame.display.update()
+
+    # game started - event loop
     for event in pygame.event.get():
-        
-        # -- QUIT --
-
         if event.type == pygame.QUIT:
             run = False
             break
 
-    if player_car.collide(MAP_COLLISIONS_MASK) != None:
-        player_car.bounce()
+        if player_car.collide(MAP_COLLISIONS_MASK) != None:
+            player_car.bounce()
+
+        moved = False
             
+        #if esc key is pressed
+        if keys[pygame.K_ESCAPE]:
+            pygame.quit()
 
-    
+        # W key is pressed
+        if keys[pygame.K_w]:
+            player_car.move_forward()
+            moved = True
+                
+        # S key is pressed
+        if keys[pygame.K_s]:
+            player_car.move_backward()
+            moved = True
 
-    moved = False
-    
-    #if esc key is pressed
-    if keys[pygame.K_ESCAPE]:
-        pygame.quit()
+        # A key is pressed
+        if keys[pygame.K_a] and player_car.vel != 0:
+            player_car.rotate(left=True)
 
-    # W key is pressed
-    if keys[pygame.K_w]:
-        player_car.move_forward()
-        moved = True
-        
-    # S key is pressed
-    if keys[pygame.K_s]:
-        player_car.move_backward()
-        moved = True
-
-    # A key is pressed
-    if keys[pygame.K_a] and player_car.vel != 0:
-        player_car.rotate(left=True)
-
-    # D key is pressed
-    if keys[pygame.K_d] and player_car.vel != 0:
-        player_car.rotate(right=True)
-    
-    # no key is pressed
-    if not moved:
-        player_car.reduce_speed()
-
-     
-    #if esc key is pressed
-    if keys[pygame.K_ESCAPE]:
-        run = False  
+        # D key is pressed
+        if keys[pygame.K_d] and player_car.vel != 0:
+            player_car.rotate(right=True)
+            
+        # no key is pressed
+        if not moved:
+            player_car.reduce_speed()
    
+        #if esc key is pressed
+        if keys[pygame.K_ESCAPE]:
+            pygame.quit() 
+    
 pygame.quit()
