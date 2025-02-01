@@ -19,8 +19,8 @@ from Functions import blit_rotate_centre
 #------------------- FILE LOADING -------------------
 
 # Import map image
-MAP = scale_image(pygame.image.load("imgs/MainMap.png"), 0.103)
-MAP_COLLISIONS = scale_image(pygame.image.load("imgs/CollisionMap.png"), 0.103)
+MAP = scale_image(pygame.image.load("imgs/MainMap.png"), 1.005)
+MAP_COLLISIONS = scale_image(pygame.image.load("imgs/CollisionMap.png"), 1)
 MAP_COLLISIONS_MASK = pygame.mask.from_surface(MAP_COLLISIONS)
 
 # Import veicle images 
@@ -34,7 +34,7 @@ UFO = scale_image(pygame.image.load("imgs/Ufo.png"), 0.005)
 COINS_UI = scale_image(pygame.image.load("imgs/CoinsUI.png"), 0.018)
 PARCEL_UI = scale_image(pygame.image.load("imgs/ParcelUI.png"), 0.018)
 SPEED_UI = scale_image(pygame.image.load("imgs/SpeedUI.png"),0.014)
-UIBACKGROUND = scale_image(pygame.image.load("imgs/UI BG.png"), 0.129)
+UIBACKGROUND = scale_image(pygame.image.load("imgs/UI BG.png"), 0.1038)
 GAMELOGO = scale_image(pygame.image.load("imgs/2Delivery Logo.png"), 0.02)
 
 MAINMENU = scale_image(pygame.image.load("imgs/MainMenuScreen.png"),0.13)
@@ -144,17 +144,14 @@ class playerCar(AbstractCar):
     START_POS = (663, 700)
 
     def bounce(self):
-        self.vel = -0.5 * self.vel
+        self.vel = -self.vel
         self.move()
 
-def draw(win, images, uiimages, player_car):
+def draw(win, images, player_car):
     for img,pos in images:
         win.blit(img, pos)
 
     player_car.draw(win)
-
-    for img,pos in uiimages:
-        win.blit(img, pos)
 
 def drawMenu(win, menuImages):
     for img,pos in menuImages:
@@ -171,9 +168,7 @@ clock = pygame.time.Clock()
 
 # -- IMAGES --
 
-images = [(UIBACKGROUND, (0,0)), (MAP, (0,0))]
-uiImages = [(PARCEL_UI, (1065,110)), (SPEED_UI, (1080,370)), (COINS_UI, (1065,240)), 
-            (GAMELOGO, (1057, 45))]
+images = [(UIBACKGROUND, (244.5,0)), (MAP, (0,0))] 
 
 menuImages = [(MAINMENU, (0,0))]
 
@@ -214,7 +209,7 @@ while run:
                break
 
     # game started - update screen
-    draw(WIN, images, uiImages, player_car)
+    draw(WIN, images, player_car)
     pygame.display.update()
 
     # game started - event loop
