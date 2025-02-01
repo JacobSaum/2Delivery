@@ -193,20 +193,26 @@ while run:
     # -- DISPLAY IMAGES --
 
     # Game not started
+    drawButt = False
+    if not gameInfo.started:
 
-    while not gameInfo.started:
-        drawMenu(WIN, menuImages)
-        play_button.drawButton()
+        if drawButt == False:
+            drawMenu(WIN, menuImages)
+            play_button.drawButton()
+            drawButt = True
+            pygame.display.update()
+        
+        while not gameInfo.started:
+        
+            for event in pygame.event.get():
 
-        for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    break
 
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                break
-
-            if play_button.clickButton() == True:
-               gameInfo.start_game()
-               break
+                if play_button.clickButton() == True:
+                    gameInfo.start_game()
+                    break
 
     # game started - update screen
     draw(WIN, images, player_car)
