@@ -38,7 +38,7 @@ MAINMENU = scale_image(pygame.image.load("imgs/MainMenuScreen.png"),0.13)
 PLAY_BUTTON = scale_image(pygame.image.load("imgs/PlayButton.png"), 0.019)
 
 # Import Fonts
-UI_FONT = pygame.font.Font("Fonts/PixelifySans-SemiBold.ttf", 44)
+UI_FONT = pygame.font.Font("Fonts/PixelifySans-SemiBold.ttf", 36)
 
 # -- ANIMATIONS --
 
@@ -212,6 +212,14 @@ while run:
 
     # game started - update screen
     draw(WIN, images, player_car)
+    coinsText = UI_FONT.render('xxxx', False, (0, 0, 0))
+    WIN.blit(coinsText, (1120, 130))
+    parcelsText = UI_FONT.render('x/x', False, (0, 0, 0))
+    WIN.blit(parcelsText, (1120, 242))
+    deliveryLocationText = UI_FONT.render('xx', False, (0, 0, 0))
+    WIN.blit(deliveryLocationText, (1120, 357))
+    speedText = UI_FONT.render('xx mph', False, (0, 0, 0))
+    WIN.blit(speedText, (1120, 470))
     pygame.display.update()
 
     # game started - event loop
