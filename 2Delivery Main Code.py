@@ -20,22 +20,18 @@ from Functions import blit_rotate_centre
 
 # Import map image
 MAP = scale_image(pygame.image.load("imgs/MainMap.png"), 1.005)
-MAP_COLLISIONS = scale_image(pygame.image.load("imgs/CollisionMap.png"), 1)
+MAP_COLLISIONS = scale_image(pygame.image.load("imgs/CollisionMap.png"), 1.005)
 MAP_COLLISIONS_MASK = pygame.mask.from_surface(MAP_COLLISIONS)
 
 # Import veicle images 
-MOPED = scale_image(pygame.image.load("imgs/RedMoped.png"), 0.005)
-PICKUP = scale_image(pygame.image.load("imgs/OrangePickup.png"), 0.005)
+MOPED = scale_image(pygame.image.load("imgs/RedMoped.png"), 0.004)
+PICKUP = scale_image(pygame.image.load("imgs/OrangePickup.png"), 0.004)
 VAN = scale_image(pygame.image.load("imgs/BlueVan.png"), 0.004)
-LORRY = scale_image(pygame.image.load("imgs/GreenLorry.png"), 0.005)
-UFO = scale_image(pygame.image.load("imgs/Ufo.png"), 0.005)
+LORRY = scale_image(pygame.image.load("imgs/GreenLorry.png"), 0.004)
+UFO = scale_image(pygame.image.load("imgs/Ufo.png"), 0.004)
 
 # Import User Interface Images
-COINS_UI = scale_image(pygame.image.load("imgs/CoinsUI.png"), 0.018)
-PARCEL_UI = scale_image(pygame.image.load("imgs/ParcelUI.png"), 0.018)
-SPEED_UI = scale_image(pygame.image.load("imgs/SpeedUI.png"),0.014)
 UIBACKGROUND = scale_image(pygame.image.load("imgs/UI BG.png"), 0.1038)
-GAMELOGO = scale_image(pygame.image.load("imgs/2Delivery Logo.png"), 0.02)
 
 MAINMENU = scale_image(pygame.image.load("imgs/MainMenuScreen.png"),0.13)
 
@@ -141,7 +137,7 @@ class AbstractCar:
 
 class playerCar(AbstractCar):   
     IMG = carSelection
-    START_POS = (663, 700)
+    START_POS = (648, 680)
 
     def bounce(self):
         self.vel = -self.vel
