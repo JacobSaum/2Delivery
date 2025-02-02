@@ -24,11 +24,11 @@ MAP_COLLISIONS = scale_image(pygame.image.load("imgs/CollisionMap.png"), 1.005)
 MAP_COLLISIONS_MASK = pygame.mask.from_surface(MAP_COLLISIONS)
 
 # Import veicle images 
-MOPED = scale_image(pygame.image.load("imgs/RedMoped.png"), 0.004)
-PICKUP = scale_image(pygame.image.load("imgs/OrangePickup.png"), 0.004)
-VAN = scale_image(pygame.image.load("imgs/BlueVan.png"), 0.004)
-LORRY = scale_image(pygame.image.load("imgs/GreenLorry.png"), 0.004)
-UFO = scale_image(pygame.image.load("imgs/Ufo.png"), 0.004)
+MOPED = scale_image(pygame.image.load("imgs/RedMoped.png"), 0.0033)
+PICKUP = scale_image(pygame.image.load("imgs/OrangePickup.png"), 0.0033)
+VAN = scale_image(pygame.image.load("imgs/BlueVan.png"), 0.0033)
+LORRY = scale_image(pygame.image.load("imgs/GreenLorry.png"), 0.0033)
+UFO = scale_image(pygame.image.load("imgs/Ufo.png"), 0.0033)
 
 # Import User Interface Images
 UIBACKGROUND = scale_image(pygame.image.load("imgs/UI BG.png"), 0.1038)
@@ -170,25 +170,22 @@ menuImages = [(MAINMENU, (0,0))]
 
 # -- PLAYER CAR --
 
-player_car = playerCar(4,4)
+player_car = playerCar(1.5,2)
 gameInfo = GameInfo()
 play_button = Button(575, 625, PLAY_BUTTON)
 
-# -- KEY PRESSES --
-
-keys = pygame.key.get_pressed()
 
 # -- EVENT LOOP --
 
 run = True
 
 while run:
-
     clock.tick(FPS)
 
-    # -- DISPLAY IMAGES --
 
-    # Game not started
+    # Update key state once per frame
+    keys = pygame.key.get_pressed()
+
     drawButt = False
     if not gameInfo.started:
 
@@ -197,8 +194,8 @@ while run:
             play_button.drawButton()
             drawButt = True
             pygame.display.update()
-        
-        while not gameInfo.started:
+
+    while not gameInfo.started:
         
             for event in pygame.event.get():
 
@@ -210,7 +207,6 @@ while run:
                     gameInfo.start_game()
                     break
 
-    # game started - update screen
     draw(WIN, images, player_car)
     coinsText = UI_FONT.render('xxxx', False, (0, 0, 0))
     WIN.blit(coinsText, (1120, 130))
@@ -220,47 +216,43 @@ while run:
     WIN.blit(deliveryLocationText, (1120, 357))
     speedText = UI_FONT.render('xx mph', False, (0, 0, 0))
     WIN.blit(speedText, (1120, 470))
-    pygame.display.update()
 
-    # game started - event loop
+    # Handle quitting events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
-            break
 
-        if player_car.collide(MAP_COLLISIONS_MASK) != None:
-            player_car.bounce()
+    # Check for movement keys
+    moved = False
 
-        moved = False
-            
-        #if esc key is pressed
-        if keys[pygame.K_ESCAPE]:
-            pygame.quit()
+    if keys[pygame.K_ESCAPE]:
+        pygame.quit()
+        break
 
-        # W key is pressed
-        if keys[pygame.K_w]:
-            player_car.move_forward()
-            moved = True
-                
-        # S key is pressed
-        if keys[pygame.K_s]:
-            player_car.move_backward()
-            moved = True
+    if keys[pygame.K_w]:
+        player_car.move_forward()
+        moved = True
 
-        # A key is pressed
-        if keys[pygame.K_a] and player_car.vel != 0:
-            player_car.rotate(left=True)
+    if keys[pygame.K_s]:
+        player_car.move_backward()
+        moved = True
 
-        # D key is pressed
-        if keys[pygame.K_d] and player_car.vel != 0:
-            player_car.rotate(right=True)
-            
-        # no key is pressed
-        if not moved:
-            player_car.reduce_speed()
-   
-        #if esc key is pressed
-        if keys[pygame.K_ESCAPE]:
-            pygame.quit() 
+    if keys[pygame.K_a] and player_car.vel != 0:
+        player_car.rotate(left=True)
+
+    if keys[pygame.K_d] and player_car.vel != 0:
+        player_car.rotate(right=True)
+
+    if not moved:
+        player_car.reduce_speed()
+
+    # Check for collisions
+    if player_car.collide(MAP_COLLISIONS_MASK) is not None:
+        player_car.bounce()
+
+    # Redraw screen (only once per frame)
+    draw(WIN, images, player_car)
+    pygame.display.update()
+
     
 pygame.quit()
