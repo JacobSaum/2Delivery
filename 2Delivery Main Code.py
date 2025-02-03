@@ -242,11 +242,6 @@ while run:
     # Game logic begins after start
     moved = False
 
-    # Esc Keybind
-    if keys[pygame.K_ESCAPE]:
-        pygame.quit()
-        break
-
     # W Keybind
     if keys[pygame.K_w]:
         player_car.move_forward()
