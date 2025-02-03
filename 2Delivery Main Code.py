@@ -18,7 +18,7 @@ from Functions import blit_rotate_centre
 
 # Import map image
 MAP = scale_image(pygame.image.load("imgs/MainMap.png"), 1.005)
-MAP_COLLISIONS = scale_image(pygame.image.load("imgs/CollisionMap.png"), 1.005)
+MAP_COLLISIONS = scale_image(pygame.image.load("imgs/CollisionMap.png"), 0.1005)
 MAP_COLLISIONS_MASK = pygame.mask.from_surface(MAP_COLLISIONS)
 
 # Import veicle images 
@@ -39,12 +39,14 @@ VOLONBUTTON = scale_image(pygame.image.load("imgs/VolumeOnButton.png"), 0.019)
 VOLOFFBUTTON = scale_image(pygame.image.load("imgs/VolumeOffButton.png"), 0.019)
 
 # Import Fonts
-UI_FONT = pygame.font.Font("Fonts/PixelifySans-SemiBold.ttf", 36)
+UI_FONT = pygame.font.Font("fonts/PixelifySans-SemiBold.ttf", 36)
 
 # -- ANIMATIONS --
 
 # -- SOUNDS --
-MENU_SONG = pygame.mixer.music.load("imgs/Menu Music.mp3")
+
+CLICK_SOUND = pygame.mixer.Sound("sounds/blipSelect.wav")
+CLICK_SOUND.set_volume(0.5)
 
 WIN = pygame.display.set_mode((1280,1024))
 pygame.display.set_caption("2Delivery")
@@ -69,25 +71,18 @@ class Button():
     def __init__(self, x, y, image):
         self.image = image
         self.rect = self.image.get_rect()
-        self.rect.topleft = (x,y)
-        self.clicked = False
+        self.rect.topleft = (x, y)
 
     def drawButton(self):
-
         WIN.blit(self.image, (self.rect.x, self.rect.y))
 
-        
-    
-    def clickButton(self):
-        action = False
-
-        mousePos = pygame.mouse.get_pos()
-
-        if self.rect.collidepoint(mousePos):
-            if pygame.mouse.get_pressed()[0] == 1:
-                action = True
-
-        return action
+    def clickButton(self, events):
+        for event in events:
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
+                if self.rect.collidepoint(event.pos):
+                    CLICK_SOUND.play()
+                    return True
+        return False
 
 
 class AbstractCar:
@@ -126,12 +121,14 @@ class AbstractCar:
         self.y -= vertical
         self.x -= horizontal
 
+    # Collision handler
     def collide(self, mask, x=0, y=0):
         car_mask = pygame.mask.from_surface(self.img)
         offset = (int(self.x - x), int(self.y - y))
         poi = mask.overlap(car_mask, offset)
         return poi
 
+    # gradually slowing down after no button presses
     def reduce_speed(self):
         self.vel = max(self.vel - self.acceleration / 2, 0)
         self.move()
@@ -154,10 +151,6 @@ def drawMenu(win, menuImages):
     for img,pos in menuImages:
         win.blit(img, pos)
 
-    
-    pygame.display.update()
-
-    
 # -- CLOCK -- 
 
 FPS = 60
@@ -177,102 +170,121 @@ play_button = Button(575, 625, PLAY_BUTTON)
 quit_Button = Button(1048, 850, QUIT_BUTTON)
 volumeOnButton = Button(1048, 700, VOLONBUTTON)
 volumeOffButton = Button(1048, 700, VOLOFFBUTTON)
+volumeOnButtonMenu = Button(1200, 20, VOLONBUTTON)
+volumeOffButtonMenu = Button(1200, 20, VOLOFFBUTTON)
 
 # -- EVENT LOOP --
-
 run = True
 
 while run:
-    clock.tick(FPS)
 
+    # set clock speed
+    clock.tick(FPS)
 
     # Update key state once per frame
     keys = pygame.key.get_pressed()
-
-    drawButt = False
-    if not gameInfo.started:
-
-        if drawButt == False:
-            drawMenu(WIN, menuImages)
-            play_button.drawButton()
-            drawButt = True
-            pygame.display.update()
-
-    while not gameInfo.started:
-        
-            for event in pygame.event.get():
-
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    break
-
-                if play_button.clickButton() == True:
-                    gameInfo.start_game()
-                    break
-
-    
+    events = pygame.event.get()  # Fetch all events once per frame
 
     # Handle quitting events
-    for event in pygame.event.get():
+    for event in events:
         if event.type == pygame.QUIT:
             run = False
 
-    # Check for movement keys
+    # Main menu handling
+    if not gameInfo.started:
+        drawMenu(WIN, menuImages)
+        play_button.drawButton()
+        if volumeBool:
+            volumeOnButtonMenu.drawButton()
+        else:
+            volumeOffButtonMenu.drawButton()
+        pygame.display.update()
+        
+        if not pygame.mixer.music.get_busy() and volumeBool:
+            pygame.mixer.music.load("sounds/Menu Music.mp3")
+            pygame.mixer.music.play(-1, 0.0)
+
+        # Check if play button is clicked
+        if play_button.clickButton(events):
+            gameInfo.start_game()
+            if volumeBool:
+                pygame.mixer.music.stop()  # Stop menu music before starting game music
+                pygame.mixer.music.load("sounds/Game Music.mp3")
+                pygame.mixer.music.play(-1, 0.0)
+            else:
+                # If music is muted, load the game music but keep it paused
+                pygame.mixer.music.stop()
+                pygame.mixer.music.load("sounds/Game Music.mp3")
+                pygame.mixer.music.play(-1, 0.0)
+                pygame.mixer.music.pause()
+
+        # Volume button handling
+        if volumeBool and volumeOnButtonMenu.clickButton(events):
+            volumeBool = False
+            pygame.mixer.music.pause()
+        elif not volumeBool and volumeOffButtonMenu.clickButton(events):
+            volumeBool = True
+            pygame.mixer.music.unpause()
+
+        continue  # Skip game logic while in the menu
+
+    # Game logic begins after start
     moved = False
 
+    # Esc Keybind
     if keys[pygame.K_ESCAPE]:
         pygame.quit()
         break
 
+    # W Keybind
     if keys[pygame.K_w]:
         player_car.move_forward()
         moved = True
 
+    # S Keybind
     if keys[pygame.K_s]:
         player_car.move_backward()
-        moved = True
+        moved 
 
+    # A Keybind
     if keys[pygame.K_a] and player_car.vel != 0:
         player_car.rotate(left=True)
 
+    # D Keybind
     if keys[pygame.K_d] and player_car.vel != 0:
         player_car.rotate(right=True)
 
+    # Gradually slowing stop for player car
     if not moved:
         player_car.reduce_speed()
 
-    # Check for collisions
+    # Check for collisions 
     if player_car.collide(MAP_COLLISIONS_MASK) is not None:
         player_car.bounce()
 
-    # Redraw screen (only once per frame)
+    # Redraw screen
     draw(WIN, images, player_car)
-
-    # Redraw Quit Button (only once per frame)
     quit_Button.drawButton()
 
-    if quit_Button.clickButton() == True:
+    # Quit button handling
+    if quit_Button.clickButton(events):
+        pygame.time.wait(250)
         run = False
         break
 
-    # Redraw Volume Button (only once per frame)
-
-    if volumeBool == True:
+    # --- VOLUME MANAGEMENT CODE ---
+    if volumeBool:
         volumeOnButton.drawButton()
-        if volumeOnButton.clickButton() == True:
+        if volumeOnButton.clickButton(events):
             volumeBool = False
-
-    else: #volumeBool == False:
+            pygame.mixer.music.pause()
+    else:
         volumeOffButton.drawButton()
-        if volumeOffButton.clickButton == True:
+        if volumeOffButton.clickButton(events):
             volumeBool = True
-        
+            pygame.mixer.music.unpause()
 
-    print (volumeBool)
-           
-
-      
-    # Redraw TExt (only once per frame)
+    # Redraw Text
     coinsText = UI_FONT.render('xxxx', False, (0, 0, 0))
     WIN.blit(coinsText, (1120, 130))
     parcelsText = UI_FONT.render('x/x', False, (0, 0, 0))
@@ -282,8 +294,7 @@ while run:
     speedText = UI_FONT.render('xx mph', False, (0, 0, 0))
     WIN.blit(speedText, (1120, 470))
 
-    # Update display (Once Per Frame)
+    # Update display
     pygame.display.update()
 
-    
 pygame.quit()
