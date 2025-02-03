@@ -53,6 +53,34 @@ pygame.display.set_caption("2Delivery")
 
 # ------------------- MAIN CODE -------------------
 
+# --- CAR STATS ---
+
+carNames=[]
+carAccelerations = []
+carMaxSpeeds=[]
+carCapacity = []
+CarDeliveryMultiplier = []
+carPrices = []
+
+csv_file = open('CarStats.csv','r') 
+for line in csv_file:                  
+    name,accell,speed,capacity,multiplier,price=line[:-1].split(',')  
+    carNames.append(name)
+    carAccelerations.append(float(accell))
+    carMaxSpeeds.append(float(speed))
+    carCapacity.append(int(capacity))
+    CarDeliveryMultiplier.append(float(multiplier))
+    carPrices.append(int(price))
+csv_file.close()                       
+
+print(carNames)
+print(carAccelerations)
+print(carMaxSpeeds)
+print(carCapacity)
+print(CarDeliveryMultiplier)
+print(carPrices)
+
+# Volume
 volumeBool = True
 
 # -- TEMP CODE --
