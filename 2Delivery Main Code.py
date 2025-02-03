@@ -80,6 +80,12 @@ print(carCapacity)
 print(CarDeliveryMultiplier)
 print(carPrices)
 
+# --- COINS SYSTEM ---
+
+startingCoins = 0
+
+playerCoins = startingCoins
+
 # Volume
 volumeBool = True
 
