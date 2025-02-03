@@ -166,12 +166,16 @@ menuImages = [(MAINMENU, (0,0))]
 
 player_car = playerCar(1.5,2)
 gameInfo = GameInfo()
-play_button = Button(575, 625, PLAY_BUTTON)
-quit_Button = Button(1048, 850, QUIT_BUTTON)
-volumeOnButton = Button(1048, 700, VOLONBUTTON)
-volumeOffButton = Button(1048, 700, VOLOFFBUTTON)
-volumeOnButtonMenu = Button(1200, 20, VOLONBUTTON)
-volumeOffButtonMenu = Button(1200, 20, VOLOFFBUTTON)
+
+# --- BUTTONS ---
+quit_Button = Button(1048, 875, QUIT_BUTTON)
+volumeOnButton = Button(1048, 765, VOLONBUTTON)
+volumeOffButton = Button(1048, 765, VOLOFFBUTTON)
+
+play_button = Button(575, 627, PLAY_BUTTON)
+volumeOnButtonMenu = Button(1070, 20, VOLONBUTTON)
+volumeOffButtonMenu = Button(1070, 20, VOLOFFBUTTON)
+quit_button_menu = Button(1070,895, QUIT_BUTTON)
 
 # -- EVENT LOOP --
 run = True
@@ -193,6 +197,13 @@ while run:
     # Main menu handling
     if not gameInfo.started:
         drawMenu(WIN, menuImages)
+
+        quit_button_menu.drawButton()
+        if quit_button_menu.clickButton(events):
+            pygame.time.wait(250)
+            run = False
+            break
+
         play_button.drawButton()
         if volumeBool:
             volumeOnButtonMenu.drawButton()
