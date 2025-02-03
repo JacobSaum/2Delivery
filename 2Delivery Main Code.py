@@ -325,7 +325,7 @@ while run:
     WIN.blit(parcelsText, (1120, 242))
     deliveryLocationText = UI_FONT.render('xx', False, (0, 0, 0))
     WIN.blit(deliveryLocationText, (1120, 357))
-    speedText = UI_FONT.render('xx mph', False, (0, 0, 0))
+    speedText = UI_FONT.render(str(round(player_car.vel,1)) + "px/s", False, (0, 0, 0))
     WIN.blit(speedText, (1120, 470))
 
     # Update display
