@@ -14,8 +14,6 @@ pygame.mixer.init()
 from Functions import scale_image
 from Functions import blit_rotate_centre
 
-#edit
-
 #------------------- FILE LOADING -------------------
 
 # Import map image
@@ -36,6 +34,9 @@ UIBACKGROUND = scale_image(pygame.image.load("imgs/UI BG.png"), 0.1038)
 MAINMENU = scale_image(pygame.image.load("imgs/MainMenuScreen.png"),0.13)
 
 PLAY_BUTTON = scale_image(pygame.image.load("imgs/PlayButton.png"), 0.019)
+QUIT_BUTTON = scale_image(pygame.image.load("imgs/QuitButton.png"), 0.019)
+VOLONBUTTON = scale_image(pygame.image.load("imgs/VolumeOnButton.png"), 0.019)
+VOLOFFBUTTON = scale_image(pygame.image.load("imgs/VolumeOffButton.png"), 0.019)
 
 # Import Fonts
 UI_FONT = pygame.font.Font("Fonts/PixelifySans-SemiBold.ttf", 36)
@@ -49,6 +50,8 @@ WIN = pygame.display.set_mode((1280,1024))
 pygame.display.set_caption("2Delivery")
 
 # ------------------- MAIN CODE -------------------
+
+volumeBool = True
 
 # -- TEMP CODE --
 carSelection = VAN
@@ -72,7 +75,6 @@ class Button():
     def drawButton(self):
 
         WIN.blit(self.image, (self.rect.x, self.rect.y))
-        pygame.display.update()
 
         
     
@@ -83,7 +85,6 @@ class Button():
 
         if self.rect.collidepoint(mousePos):
             if pygame.mouse.get_pressed()[0] == 1:
-                print("CLICKED")
                 action = True
 
         return action
@@ -173,7 +174,9 @@ menuImages = [(MAINMENU, (0,0))]
 player_car = playerCar(1.5,2)
 gameInfo = GameInfo()
 play_button = Button(575, 625, PLAY_BUTTON)
-
+quit_Button = Button(1048, 850, QUIT_BUTTON)
+volumeOnButton = Button(1048, 700, VOLONBUTTON)
+volumeOffButton = Button(1048, 700, VOLOFFBUTTON)
 
 # -- EVENT LOOP --
 
@@ -207,15 +210,7 @@ while run:
                     gameInfo.start_game()
                     break
 
-    draw(WIN, images, player_car)
-    coinsText = UI_FONT.render('xxxx', False, (0, 0, 0))
-    WIN.blit(coinsText, (1120, 130))
-    parcelsText = UI_FONT.render('x/x', False, (0, 0, 0))
-    WIN.blit(parcelsText, (1120, 242))
-    deliveryLocationText = UI_FONT.render('xx', False, (0, 0, 0))
-    WIN.blit(deliveryLocationText, (1120, 357))
-    speedText = UI_FONT.render('xx mph', False, (0, 0, 0))
-    WIN.blit(speedText, (1120, 470))
+    
 
     # Handle quitting events
     for event in pygame.event.get():
@@ -252,6 +247,42 @@ while run:
 
     # Redraw screen (only once per frame)
     draw(WIN, images, player_car)
+
+    # Redraw Quit Button (only once per frame)
+    quit_Button.drawButton()
+
+    if quit_Button.clickButton() == True:
+        run = False
+        break
+
+    # Redraw Volume Button (only once per frame)
+
+    if volumeBool == True:
+        volumeOnButton.drawButton()
+        if volumeOnButton.clickButton() == True:
+            volumeBool = False
+
+    else: #volumeBool == False:
+        volumeOffButton.drawButton()
+        if volumeOffButton.clickButton == True:
+            volumeBool = True
+        
+
+    print (volumeBool)
+           
+
+      
+    # Redraw TExt (only once per frame)
+    coinsText = UI_FONT.render('xxxx', False, (0, 0, 0))
+    WIN.blit(coinsText, (1120, 130))
+    parcelsText = UI_FONT.render('x/x', False, (0, 0, 0))
+    WIN.blit(parcelsText, (1120, 242))
+    deliveryLocationText = UI_FONT.render('xx', False, (0, 0, 0))
+    WIN.blit(deliveryLocationText, (1120, 357))
+    speedText = UI_FONT.render('xx mph', False, (0, 0, 0))
+    WIN.blit(speedText, (1120, 470))
+
+    # Update display (Once Per Frame)
     pygame.display.update()
 
     
