@@ -275,6 +275,28 @@ def giveParcels(capacity):
     
     return currentParcels
 
+# Pay player after delivery function
+def payPlayer(playerMoney, deliveryLocation, carMultiplier):
+
+    randomNum = random.randint(75,100) # Create random payout number between 75-100
+
+    moneyGain = 0
+    
+    if deliveryLocation[0:1] == "H":
+        moneyGain = randomNum*carMultiplier
+        playerMoney += moneyGain
+    elif deliveryLocation[0:1] == "M":
+        moneyGain = (2*randomNum)*carMultiplier
+        playerMoney += moneyGain
+    elif deliveryLocation[0:1] == "A":
+        moneyGain = (2.5*randomNum)*carMultiplier
+        playerMoney += moneyGain
+    else:
+        moneyGain = (randomNum*1.5)*carMultiplier
+        playerMoney += moneyGain
+    
+    return playerMoney, moneyGain
+
 # -- CLOCK -- 
 
 FPS = 60
@@ -315,7 +337,10 @@ exit_time = 0  # Timestamp when the player exited
 cooldown_duration = 2000  # Cooldown duration in milliseconds (1 second)
 
 currentParcels = []
-capacity = 4 # TEMPOARY
+
+# car variables
+capacity = 4
+carMultiplier = 1.5
 
 
 
@@ -462,7 +487,7 @@ while run:
             exit_time = pygame.time.get_ticks()
         
         if parcelButton.clickButton(events):
-            currentParcels = giveParcels(4) # PLACEHOLDER 4 FOR CAPACITY
+            currentParcels = giveParcels(capacity)
             print(currentParcels)
             warehouse_exited = True 
 
@@ -472,13 +497,25 @@ while run:
         if current_time - exit_time >= cooldown_duration:
             warehouse_exited = False 
 
+    # --- DELIVERYS ---
+    if currentParcels:  # Check if there are parcels to deliver
+        if current_location == currentParcels[0]:  # Check if the player is at the first delivery location
+            playerCoins, coinsGain =payPlayer(playerCoins, currentParcels[0], carMultiplier)
+            currentParcels.pop(0)  # Remove the delivered location from the list
+            print(f"Delivered! Remaining parcels: {currentParcels}")
+
+        
+
      # Redraw Text
     coinsText = UI_FONT.render(str(playerCoins), False, (0, 0, 0))
     WIN.blit(coinsText, (1120, 130))
     parcelsText = UI_FONT.render(str((len(currentParcels))) + " / " + str(capacity), False, (0, 0, 0))
     WIN.blit(parcelsText, (1120, 242))
-    deliveryLocationText = UI_FONT.render('xx', False, (0, 0, 0))
-    WIN.blit(deliveryLocationText, (1120, 357))
+    if currentParcels:
+        deliveryLocationText = UI_FONT.render(currentParcels[0], False, (0, 0, 0))
+    else:
+        deliveryLocationText = UI_FONT.render("N/A", False, (0, 0, 0))
+    WIN.blit(deliveryLocationText, (1120, 357))  # Always display the text
     speedText = UI_FONT.render(str(round(player_car.vel, 1)) + "px/s", False, (0, 0, 0))
     WIN.blit(speedText, (1120, 470))
         
