@@ -38,6 +38,53 @@ QUIT_BUTTON = scale_image(pygame.image.load("imgs/QuitButton.png"), 0.019)
 VOLONBUTTON = scale_image(pygame.image.load("imgs/VolumeOnButton.png"), 0.019)
 VOLOFFBUTTON = scale_image(pygame.image.load("imgs/VolumeOffButton.png"), 0.019)
 
+# --- DELIVERY COLLISION MASKS ---
+
+CARSHOPCOLLISION = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions/CarShopCollision.png"), 1.005))
+
+WAREHOUSECOLLISION = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions/WarehouseCollision.png"), 1.005))
+
+# Apartments
+A1 = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions/A1Collision.png"), 1.005))
+A2 = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions/A2Collision.png"), 1.005))
+A3 = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions/A3Collision.png"), 1.005))
+A4 = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions/A4Collision.png"), 1.005))
+A5 = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions/A5Collision.png"), 1.005))
+
+# Cabins
+C1 = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions/C1Collision.png"), 1.005))
+C2 = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions/C2Collision.png"), 1.005))
+C3 = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions/C3Collision.png"), 1.005))
+
+# Houses
+H1 = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions/H1Collision.png"), 1.005))
+H2 = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions/H2Collision.png"), 1.005))
+H3 = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions/H3Collision.png"), 1.005))
+H4 = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions/H4Collision.png"), 1.005))
+H5 = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions/H5Collision.png"), 1.005))
+H6 = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions/H6Collision.png"), 1.005))
+H7 = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions/H7Collision.png"), 1.005))
+H8 = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions/H8Collision.png"), 1.005))
+H9 = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions/H9Collision.png"), 1.005))
+H10 = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions/H10Collision.png"), 1.005))
+H11 = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions/H11Collision.png"), 1.005))
+H12 = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions/H12Collision.png"), 1.005))
+H13 = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions/H13Collision.png"), 1.005))
+H14 = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions/H14Collision.png"), 1.005))
+
+# Modern Houses
+M1 = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions/M1Collision.png"), 1.005))
+M2 = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions/M2Collision.png"), 1.005))
+M3 = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions/M3Collision.png"), 1.005))
+M4 = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions/M4Collision.png"), 1.005))
+M5 = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions/M5Collision.png"), 1.005))
+M6 = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions/M6Collision.png"), 1.005))
+M7 = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions/M7Collision.png"), 1.005))
+M8 = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions/M8Collision.png"), 1.005))
+M9 = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions/M9Collision.png"), 1.005))
+M10 = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions/M10Collision.png"), 1.005))
+
+
 # Import Fonts
 UI_FONT = pygame.font.Font("fonts/PixelifySans-SemiBold.ttf", 36)
 
@@ -185,6 +232,22 @@ def drawMenu(win, menuImages):
     for img,pos in menuImages:
         win.blit(img, pos)
 
+def get_current_delivery_location(player_car):
+    delivery_collisions = {
+        "CS": CARSHOPCOLLISION,
+        "WH": WAREHOUSECOLLISION,
+        "A1": A1, "A2": A2, "A3": A3, "A4": A4, "A5": A5,
+        "C1": C1, "C2": C2, "C3": C3,
+        "H1": H1, "H2": H2, "H3": H3, "H4": H4, "H5": H5, "H6": H6, "H7": H7, "H8": H8, "H9": H9, "H10": H10, "H11": H11, "H12": H12, "H13": H13, "H14": H14,
+        "M1": M1, "M2": M2, "M3": M3, "M4C": M4, "M5": M5, "M6": M6, "M7": M7, "M8": M8, "M9": M9, "M10": M10
+    }
+
+    for location_name, mask in delivery_collisions.items():
+        if player_car.collide(mask) is not None:
+            return location_name  # Return the collision file name if a collision is detected
+
+    return None  # Return None if no collision is found
+
 # -- CLOCK -- 
 
 FPS = 60
@@ -272,6 +335,10 @@ while run:
             pygame.mixer.music.unpause()
 
         continue  # Skip game logic while in the menu
+
+    current_location = get_current_delivery_location(player_car)
+    if current_location:
+        print(f"Player is at: {current_location}")
 
     # Game logic begins after start
     moved = False
