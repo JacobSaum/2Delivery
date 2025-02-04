@@ -39,6 +39,10 @@ VOLONBUTTON = scale_image(pygame.image.load("imgs/VolumeOnButton.png"), 0.019)
 VOLOFFBUTTON = scale_image(pygame.image.load("imgs/VolumeOffButton.png"), 0.019)
 
 CARSHOPUI = scale_image(pygame.image.load("imgs/carShopUI.png"), 0.085)
+BUYBUTTON = scale_image(pygame.image.load("imgs/buyButton.png"), 0.085)
+
+WAREHOUSEUI = scale_image(pygame.image.load("imgs/WarehouseUI.png"), 0.085)
+PARCELBUTTON = scale_image(pygame.image.load("imgs/WarehouseParcelButton.png"), 0.04)
 
 UIEXITBUTTON = scale_image(pygame.image.load("imgs/MenuExitButton.png"), 0.008)
 
@@ -220,7 +224,7 @@ class AbstractCar:
 
 class playerCar(AbstractCar):   
     IMG = carSelection
-    START_POS = (648, 680)
+    START_POS = (648, 715)
 
     def bounce(self):
         self.vel = -self.vel
@@ -243,7 +247,7 @@ def get_current_delivery_location(player_car):
         "A1": A1, "A2": A2, "A3": A3, "A4": A4, "A5": A5,
         "C1": C1, "C2": C2, "C3": C3,
         "H1": H1, "H2": H2, "H3": H3, "H4": H4, "H5": H5, "H6": H6, "H7": H7, "H8": H8, "H9": H9, "H10": H10, "H11": H11, "H12": H12, "H13": H13, "H14": H14,
-        "M1": M1, "M2": M2, "M3": M3, "M4C": M4, "M5": M5, "M6": M6, "M7": M7, "M8": M8, "M9": M9, "M10": M10
+        "M1": M1, "M2": M2, "M3": M3, "M4": M4, "M5": M5, "M6": M6, "M7": M7, "M8": M8, "M9": M9, "M10": M10
     }
 
     for location_name, mask in delivery_collisions.items():
@@ -251,6 +255,25 @@ def get_current_delivery_location(player_car):
             return location_name  # Return the collision file name if a collision is detected
 
     return None  # Return None if no collision is found
+
+# Warehouse - Give parcels button function
+def giveParcels(capacity):
+    deliveryLocations = ["A1", "A2", "A3", "A4", "A5",
+                            "C1", "C2", "C3",
+                            "H1", "H2", "H3", "H4", "H5", "H6", "H7", "H8", "H9", "H10", "H11", "H12", "H13", "H14",
+                            "M1", "M2", "M3", "M4", "M5", "M6", "M7", "M8", "M9", "M10"
+                        ]
+
+    currentParcels = [""] * capacity
+
+    for x in range(capacity):
+        # Generate a random index within the range of deliveryLocations
+        random_index = random.randint(0, len(deliveryLocations) - 1)
+        
+        # Assign the randomly selected location to the currentParcels list
+        currentParcels[x] = deliveryLocations[random_index]
+    
+    return currentParcels
 
 # -- CLOCK -- 
 
@@ -280,12 +303,20 @@ quit_button_menu = Button(1070,895, QUIT_BUTTON)
 
 UI_Quit_Button = Button(860, 200, UIEXITBUTTON)
 
+#carShopBuyButton = Button(x,x, BUYBUTTON)
+parcelButton = Button(300, 400, PARCELBUTTON)
+
 # Variables
 run = True
 
-car_shop_exited = False  # Track if the player has exited the Car Shop
-exit_time = 0  # Timestamp when the player exited the Car Shop
+car_shop_exited = False  # Track if the player has exited the Car Shop UI
+warehouse_exited = False # Track if the player has exited the Warehouse UI
+exit_time = 0  # Timestamp when the player exited
 cooldown_duration = 2000  # Cooldown duration in milliseconds (1 second)
+
+currentParcels = []
+capacity = 4 # TEMPOARY
+
 
 
 # -- EVENT LOOP --
@@ -400,31 +431,57 @@ while run:
             volumeBool = True
             pygame.mixer.music.unpause()
 
-    # Redraw Text
-    coinsText = UI_FONT.render('xxxx', False, (0, 0, 0))
-    WIN.blit(coinsText, (1120, 130))
-    parcelsText = UI_FONT.render('x/x', False, (0, 0, 0))
-    WIN.blit(parcelsText, (1120, 242))
-    deliveryLocationText = UI_FONT.render('xx', False, (0, 0, 0))
-    WIN.blit(deliveryLocationText, (1120, 357))
-    speedText = UI_FONT.render(str(round(player_car.vel, 1)) + "px/s", False, (0, 0, 0))
-    WIN.blit(speedText, (1120, 470))
+   
 
+
+    # --- CAR SHOP ---
     if current_location == "CS" and not car_shop_exited:
         WIN.blit(CARSHOPUI, (75, 225))
         UI_Quit_Button.drawButton()
 
         if UI_Quit_Button.clickButton(events):
             current_location = None
-            car_shop_exited = True  # Mark the car shop as exited
-            exit_time = pygame.time.get_ticks()  # Record the exit time
+            car_shop_exited = True 
+            exit_time = pygame.time.get_ticks()
 
-    # Handle exit cooldown logic
     if car_shop_exited and current_location != "CS":
         current_time = pygame.time.get_ticks()
         if current_time - exit_time >= cooldown_duration:
-            car_shop_exited = False  # Reset the exit flag after the cooldown
+            car_shop_exited = False 
 
+
+    # --- WAREHOUSE ---
+    if current_location == "WH" and not warehouse_exited:
+        WIN.blit(WAREHOUSEUI, (75, 225))
+        parcelButton.drawButton()
+        UI_Quit_Button.drawButton()
+
+        if UI_Quit_Button.clickButton(events):
+            current_location = None
+            warehouse_exited = True 
+            exit_time = pygame.time.get_ticks()
+        
+        if parcelButton.clickButton(events):
+            currentParcels = giveParcels(4) # PLACEHOLDER 4 FOR CAPACITY
+            print(currentParcels)
+            warehouse_exited = True 
+
+
+    if warehouse_exited and current_location != "WH":
+        current_time = pygame.time.get_ticks()
+        if current_time - exit_time >= cooldown_duration:
+            warehouse_exited = False 
+
+     # Redraw Text
+    coinsText = UI_FONT.render(str(playerCoins), False, (0, 0, 0))
+    WIN.blit(coinsText, (1120, 130))
+    parcelsText = UI_FONT.render(str((len(currentParcels))) + " / " + str(capacity), False, (0, 0, 0))
+    WIN.blit(parcelsText, (1120, 242))
+    deliveryLocationText = UI_FONT.render('xx', False, (0, 0, 0))
+    WIN.blit(deliveryLocationText, (1120, 357))
+    speedText = UI_FONT.render(str(round(player_car.vel, 1)) + "px/s", False, (0, 0, 0))
+    WIN.blit(speedText, (1120, 470))
+        
     # Update display
     pygame.display.update()
 
