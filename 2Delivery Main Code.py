@@ -285,7 +285,7 @@ run = True
 
 car_shop_exited = False  # Track if the player has exited the Car Shop
 exit_time = 0  # Timestamp when the player exited the Car Shop
-cooldown_duration = 1000  # Cooldown duration in milliseconds (1 second)
+cooldown_duration = 2000  # Cooldown duration in milliseconds (1 second)
 
 
 # -- EVENT LOOP --
@@ -410,7 +410,7 @@ while run:
     speedText = UI_FONT.render(str(round(player_car.vel, 1)) + "px/s", False, (0, 0, 0))
     WIN.blit(speedText, (1120, 470))
 
-    if current_location == "WH" and not car_shop_exited:
+    if current_location == "CS" and not car_shop_exited:
         WIN.blit(CARSHOPUI, (75, 225))
         UI_Quit_Button.drawButton()
 
