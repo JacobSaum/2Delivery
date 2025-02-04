@@ -45,6 +45,8 @@ WAREHOUSEUI = scale_image(pygame.image.load("imgs/WarehouseUI.png"), 0.085)
 PARCELBUTTON = scale_image(pygame.image.load("imgs/WarehouseParcelButton.png"), 0.04)
 
 UIEXITBUTTON = scale_image(pygame.image.load("imgs/MenuExitButton.png"), 0.008)
+MAPBUTTON = scale_image(pygame.image.load("imgs/MapButton.png"), 0.008)
+MAPUI = scale_image(pygame.image.load("imgs/LocationMap.png"), 1)
 
 # --- DELIVERY COLLISION MASKS ---
 
@@ -317,6 +319,7 @@ gameInfo = GameInfo()
 quit_Button = Button(1048, 875, QUIT_BUTTON)
 volumeOnButton = Button(1048, 765, VOLONBUTTON)
 volumeOffButton = Button(1048, 765, VOLOFFBUTTON)
+mapButton = Button(1048,655,MAPBUTTON)
 
 play_button = Button(575, 627, PLAY_BUTTON)
 volumeOnButtonMenu = Button(1070, 20, VOLONBUTTON)
@@ -337,6 +340,8 @@ exit_time = 0  # Timestamp when the player exited
 cooldown_duration = 2000  # Cooldown duration in milliseconds (1 second)
 
 currentParcels = []
+
+map_ui_open = False
 
 # car variables
 capacity = 4
@@ -456,6 +461,17 @@ while run:
             volumeBool = True
             pygame.mixer.music.unpause()
 
+    mapButton.drawButton()
+    if mapButton.clickButton(events):  # Pass events to check for clicks
+        map_ui_open = True  # Open the map UI
+
+    if map_ui_open:  # Only draw the map UI if it's open
+        WIN.blit(MAPUI, (75, 225))  # Draw the map UI
+        UI_Quit_Button.drawButton()
+
+    # Quit button for map UI
+        if UI_Quit_Button.clickButton(events):
+            map_ui_open = False  # Close the map UI
    
 
 
