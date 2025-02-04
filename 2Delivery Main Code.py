@@ -38,6 +38,10 @@ QUIT_BUTTON = scale_image(pygame.image.load("imgs/QuitButton.png"), 0.019)
 VOLONBUTTON = scale_image(pygame.image.load("imgs/VolumeOnButton.png"), 0.019)
 VOLOFFBUTTON = scale_image(pygame.image.load("imgs/VolumeOffButton.png"), 0.019)
 
+CARSHOPUI = scale_image(pygame.image.load("imgs/carShopUI.png"), 0.085)
+
+UIEXITBUTTON = scale_image(pygame.image.load("imgs/MenuExitButton.png"), 0.008)
+
 # --- DELIVERY COLLISION MASKS ---
 
 CARSHOPCOLLISION = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions/CarShopCollision.png"), 1.005))
@@ -274,11 +278,18 @@ volumeOnButtonMenu = Button(1070, 20, VOLONBUTTON)
 volumeOffButtonMenu = Button(1070, 20, VOLOFFBUTTON)
 quit_button_menu = Button(1070,895, QUIT_BUTTON)
 
-# -- EVENT LOOP --
+UI_Quit_Button = Button(860, 200, UIEXITBUTTON)
+
+# Variables
 run = True
 
-while run:
+car_shop_exited = False  # Track if the player has exited the Car Shop
+exit_time = 0  # Timestamp when the player exited the Car Shop
+cooldown_duration = 1000  # Cooldown duration in milliseconds (1 second)
 
+
+# -- EVENT LOOP --
+while run:
     # set clock speed
     clock.tick(FPS)
 
@@ -307,7 +318,7 @@ while run:
         else:
             volumeOffButtonMenu.drawButton()
         pygame.display.update()
-        
+
         if not pygame.mixer.music.get_busy() and volumeBool:
             pygame.mixer.music.load("sounds/Menu Music.mp3")
             pygame.mixer.music.play(-1, 0.0)
@@ -337,8 +348,6 @@ while run:
         continue  # Skip game logic while in the menu
 
     current_location = get_current_delivery_location(player_car)
-    if current_location:
-        print(f"Player is at: {current_location}")
 
     # Game logic begins after start
     moved = False
@@ -351,7 +360,7 @@ while run:
     # S Keybind
     if keys[pygame.K_s]:
         player_car.move_backward()
-        moved 
+        moved = True
 
     # A Keybind
     if keys[pygame.K_a] and player_car.vel != 0:
@@ -365,7 +374,7 @@ while run:
     if not moved:
         player_car.reduce_speed()
 
-    # Check for collisions 
+    # Check for collisions
     if player_car.collide(MAP_COLLISIONS_MASK) is not None:
         player_car.bounce()
 
@@ -398,8 +407,23 @@ while run:
     WIN.blit(parcelsText, (1120, 242))
     deliveryLocationText = UI_FONT.render('xx', False, (0, 0, 0))
     WIN.blit(deliveryLocationText, (1120, 357))
-    speedText = UI_FONT.render(str(round(player_car.vel,1)) + "px/s", False, (0, 0, 0))
+    speedText = UI_FONT.render(str(round(player_car.vel, 1)) + "px/s", False, (0, 0, 0))
     WIN.blit(speedText, (1120, 470))
+
+    if current_location == "WH" and not car_shop_exited:
+        WIN.blit(CARSHOPUI, (75, 225))
+        UI_Quit_Button.drawButton()
+
+        if UI_Quit_Button.clickButton(events):
+            current_location = None
+            car_shop_exited = True  # Mark the car shop as exited
+            exit_time = pygame.time.get_ticks()  # Record the exit time
+
+    # Handle exit cooldown logic
+    if car_shop_exited and current_location != "CS":
+        current_time = pygame.time.get_ticks()
+        if current_time - exit_time >= cooldown_duration:
+            car_shop_exited = False  # Reset the exit flag after the cooldown
 
     # Update display
     pygame.display.update()
