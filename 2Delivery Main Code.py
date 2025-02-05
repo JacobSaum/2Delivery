@@ -99,6 +99,8 @@ M10 = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions
 # Import Fonts
 UI_FONT = pygame.font.Font("fonts/PixelifySans-SemiBold.ttf", 36)
 SMALL_UI_FONT = pygame.font.Font("fonts/PixelifySans-SemiBold.ttf", 14)
+LARGE_UI_FONT = pygame.font.Font("fonts/PixelifySans-SemiBold.ttf", 70)
+STATS_UI_FONT = pygame.font.Font("fonts/PixelifySans-SemiBold.ttf", 27)
 # -- ANIMATIONS --
 
 # -- SOUNDS --
@@ -135,7 +137,7 @@ for line in csv_file:
     carPrices.append(int(price))
 csv_file.close()  
 
-carImages = [MOPED, VAN, PICKUP, LORRY, UFO]
+carImages = [MOPED, PICKUP, VAN, LORRY, UFO]
 
 print(carNames)
 print(carMaxSpeeds)
@@ -496,9 +498,11 @@ while run:
         if carNumber < len(carPrices) - 1:  # Check if there is a next car to buy
             next_car_price = carPrices[carNumber + 1]  # Get the price of the next car
 
-            # Display the correct price
-            price_text = UI_FONT.render(f"Price: {next_car_price}", False, (0, 0, 0))
-            WIN.blit(price_text, (300, 250))  # Adjust the position as needed
+            price_text = LARGE_UI_FONT.render(str(next_car_price), False, (0, 0, 0))
+            speedStatstext = STATS_UI_FONT.render("Max Speed: " + str(carMaxSpeeds[carNumber + 1]), False, (0, 0, 0))
+            capactiyStats = STATS_UI_FONT.render("Capacity: " + str(carCapacity[carNumber + 1]), False, (0, 0, 0))
+            carMultiplierStats = STATS_UI_FONT.render("Multiplier: " + str(CarDeliveryMultiplier[carNumber + 1]), False, (0, 0, 0))
+            carnameStats = LARGE_UI_FONT.render(str(carNames[carNumber + 1]), False, (0, 0, 0))
 
             if playerCoins >= next_car_price:
                 BuyButton.drawButton()
@@ -532,6 +536,25 @@ while run:
                 if GreyDrawButton.clickButton(events):
                     # Play error sound
                     ERROR_SOUND.play()
+
+        else:
+            price_text = LARGE_UI_FONT.render("N/A", False, (0, 0, 0))
+            speedStatstext = STATS_UI_FONT.render("Max Speed: N/A ", False, (0, 0, 0))
+            capactiyStats = STATS_UI_FONT.render("Capacity: N/A", False, (0, 0, 0))                      
+            carMultiplierStats = STATS_UI_FONT.render("Multiplier: N/A", False, (0, 0, 0))
+            carnameStats = LARGE_UI_FONT.render("N/A", False, (0, 0, 0))
+
+
+        # Display Max Speed Stats
+        WIN.blit(speedStatstext, (140, 540))
+        # Display Capacity Stats
+        WIN.blit(capactiyStats, (140, 590))
+        # Display Car Multiplier Stats
+        WIN.blit(carMultiplierStats, (140, 640))
+        # Display car name
+        WIN.blit(carnameStats, (380, 335))
+        # Display car price
+        WIN.blit(price_text, (575, 450))
 
         if carShopQuitButton.clickButton(events):
             current_location = None

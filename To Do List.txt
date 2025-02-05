@@ -3,9 +3,8 @@
 --------------------
 
 - Fix Collision System 
-- Create Delivery System
 - Money System
 - Car Buying System
 - Car stats System
-- Shop UI
+- "buynextcar" function
 - + TONS more 
