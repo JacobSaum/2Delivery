@@ -486,6 +486,31 @@ while run:
         # Quit button for map UI
         if mapQuitButton.clickButton(events):
             map_ui_open = False  # Close the map UI
+
+    # --- WAREHOUSE ---
+    if current_location == "WH" and not warehouse_exited:
+        print("Rendering Warehouse UI")  # Debug statement
+        WIN.blit(WAREHOUSEUI, (75, 225))  # Draw the warehouse UI
+        warehouseQuitButton.drawButton()  # Draw the quit button
+        parcelButton.drawButton()  # Draw the parcel button
+
+        # Handle quit button click
+        if warehouseQuitButton.clickButton(events):
+            current_location = None
+            warehouse_exited = True
+            exit_time = pygame.time.get_ticks()
+
+        # Handle parcel button click
+        if parcelButton.clickButton(events):
+            currentParcels = giveParcels(carCapacity[carNumber])
+            print(f"Parcels Assigned: {currentParcels}")
+            warehouse_exited = True
+
+    # Reset warehouse_exited after cooldown
+    if warehouse_exited and current_location != "WH":
+        current_time = pygame.time.get_ticks()
+        if current_time - exit_time >= cooldown_duration:
+            warehouse_exited = False
    
 
 
