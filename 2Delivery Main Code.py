@@ -22,11 +22,11 @@ MAP_COLLISIONS = scale_image(pygame.image.load("imgs/CollisionMap.png"), 0.1005)
 MAP_COLLISIONS_MASK = pygame.mask.from_surface(MAP_COLLISIONS)
 
 # Import veicle images 
-MOPED = scale_image(pygame.image.load("imgs/RedMoped.png"), 0.0033)
-PICKUP = scale_image(pygame.image.load("imgs/OrangePickup.png"), 0.0033)
-VAN = scale_image(pygame.image.load("imgs/BlueVan.png"), 0.0033)
-LORRY = scale_image(pygame.image.load("imgs/GreenLorry.png"), 0.0033)
-UFO = scale_image(pygame.image.load("imgs/Ufo.png"), 0.0033)
+MOPED = scale_image(pygame.image.load("imgs/RedMoped.png"), 0.0027)
+PICKUP = scale_image(pygame.image.load("imgs/OrangePickup.png"), 0.0035)
+VAN = scale_image(pygame.image.load("imgs/BlueVan.png"), 0.003)
+LORRY = scale_image(pygame.image.load("imgs/GreenLorry.png"), 0.004)
+UFO = scale_image(pygame.image.load("imgs/Ufo.png"), 0.0025)
 
 # Import User Interface Images
 UIBACKGROUND = scale_image(pygame.image.load("imgs/UI BG.png"), 0.1038)
@@ -39,7 +39,8 @@ VOLONBUTTON = scale_image(pygame.image.load("imgs/VolumeOnButton.png"), 0.019)
 VOLOFFBUTTON = scale_image(pygame.image.load("imgs/VolumeOffButton.png"), 0.019)
 
 CARSHOPUI = scale_image(pygame.image.load("imgs/carShopUI.png"), 0.085)
-BUYBUTTON = scale_image(pygame.image.load("imgs/buyButton.png"), 0.085)
+BUYBUTTON = scale_image(pygame.image.load("imgs/buyButton.png"), 0.03)
+GREYBUYBUTTON  = scale_image(pygame.image.load("imgs/GreyBuyButton.png"), 0.03)
 
 WAREHOUSEUI = scale_image(pygame.image.load("imgs/WarehouseUI.png"), 0.085)
 PARCELBUTTON = scale_image(pygame.image.load("imgs/WarehouseParcelButton.png"), 0.04)
@@ -104,6 +105,9 @@ SMALL_UI_FONT = pygame.font.Font("fonts/PixelifySans-SemiBold.ttf", 14)
 
 CLICK_SOUND = pygame.mixer.Sound("sounds/blipSelect.wav")
 CLICK_SOUND.set_volume(0.5)
+ERROR_SOUND = pygame.mixer.Sound("sounds/ErrorSound.mp3")
+COIN_GAIN_SOUND = pygame.mixer.Sound("sounds/CoinGainSound.mp3")
+COIN_SPEND_SOUND = pygame.mixer.Sound("sounds/CoinSpendSound.wav")
 
 WIN = pygame.display.set_mode((1280,1024))
 pygame.display.set_caption("2Delivery")
@@ -141,15 +145,15 @@ print(carPrices)
 
 # --- COINS SYSTEM ---
 
-startingCoins = 0
+startingCoins = 5000
 
 playerCoins = startingCoins
 
 # Volume
 volumeBool = True
 
-# -- TEMP CODE --
-carSelection = VAN
+carImage = carImages[0]
+
 
 # -- CLASSES --
 
@@ -179,15 +183,14 @@ class Button():
 
 
 class AbstractCar:
-
-    def __init__ (self, max_vel, rotation_vel):
+    def __init__(self, max_vel, rotation_vel, start_pos):
         self.img = self.IMG
         self.max_vel = max_vel
         self.vel = 0
         self.rotation_vel = rotation_vel
         self.angle = 0
-        self.x, self.y = self.START_POS
-        self.acceleration = 0.1
+        self.x, self.y = start_pos 
+        self.acceleration = 0.05
 
     def rotate(self, left=False, right=False):
         if left:
@@ -226,9 +229,11 @@ class AbstractCar:
         self.vel = max(self.vel - self.acceleration / 2, 0)
         self.move()
 
-class playerCar(AbstractCar):   
-    IMG = carSelection
-    START_POS = (648, 715)
+class playerCar(AbstractCar):
+    def __init__(self, max_vel, rotation_vel, car_image):
+        self.IMG = car_image  # Set the car image dynamically
+        self.START_POS = (75, 75)  # Define the starting position
+        super().__init__(max_vel, rotation_vel, self.START_POS)  # Pass START_POS to the parent class
 
     def bounce(self):
         self.vel = -self.vel
@@ -314,7 +319,7 @@ menuImages = [(MAINMENU, (0,0))]
 
 # -- PLAYER CAR --
 
-player_car = playerCar(carMaxSpeeds[carNumber],2)
+player_car = playerCar(carMaxSpeeds[carNumber], 2, carImages[carNumber])
 gameInfo = GameInfo()
 
 # --- BUTTONS ---
@@ -329,11 +334,14 @@ volumeOffButtonMenu = Button(1070, 20, VOLOFFBUTTON)
 quit_button_menu = Button(1070,895, QUIT_BUTTON)
 
 uiQuitButton = Button(860, 200, UIEXITBUTTON)
-mapQuitButton = Button(865, 55, UIEXITBUTTON)
-carShopQuitButton = Button(860, 200, UIEXITBUTTON)
-warehouseQuitButton = Button(860, 200, UIEXITBUTTON)
 
-#carShopBuyButton = Button(x,x, BUYBUTTON)
+mapQuitButton = Button(865, 55, UIEXITBUTTON)
+
+carShopQuitButton = Button(860, 200, UIEXITBUTTON)
+BuyButton = Button(500, 585, BUYBUTTON)
+GreyDrawButton = Button(500, 585, GREYBUYBUTTON)
+
+warehouseQuitButton = Button(860, 200, UIEXITBUTTON)
 parcelButton = Button(300, 400, PARCELBUTTON)
 
 # Variables
@@ -484,9 +492,50 @@ while run:
         WIN.blit(CARSHOPUI, (75, 225))
         carShopQuitButton.drawButton()
 
+        # Ensure carNumber is within the valid range
+        if carNumber < len(carPrices) - 1:  # Check if there is a next car to buy
+            next_car_price = carPrices[carNumber + 1]  # Get the price of the next car
+
+            # Display the correct price
+            price_text = UI_FONT.render(f"Price: {next_car_price}", False, (0, 0, 0))
+            WIN.blit(price_text, (300, 250))  # Adjust the position as needed
+
+            if playerCoins >= next_car_price:
+                BuyButton.drawButton()
+                if BuyButton.clickButton(events):  # Check if the Buy button is clicked
+                    # Store the current car's position
+                    current_x, current_y = player_car.x, player_car.y
+
+                    # Deduct the price from player's coins and move to the next car
+                    playerCoins -= next_car_price
+
+                    # Change car num
+                    carNumber += 1
+
+                    # Play spend sound
+                    COIN_SPEND_SOUND.play()
+
+                    # Update the car image
+                    carImage = carImages[carNumber]
+
+                    # Create a new player car with the updated stats and image
+                    player_car = playerCar(carMaxSpeeds[carNumber], 2, carImages[carNumber])
+
+                    # Set the new car's position to the stored coordinates
+                    player_car.x, player_car.y = current_x, current_y
+
+                    print(f"Purchased {carNames[carNumber]}! Remaining coins: {playerCoins}, carNumber = {carNumber}")
+
+                    car_shop_exited = True
+            else:
+                GreyDrawButton.drawButton()  # Draw the greyed-out buy button if the player can't afford the car
+                if GreyDrawButton.clickButton(events):
+                    # Play error sound
+                    ERROR_SOUND.play()
+
         if carShopQuitButton.clickButton(events):
             current_location = None
-            car_shop_exited = True 
+            car_shop_exited = True
             exit_time = pygame.time.get_ticks()
 
     if car_shop_exited and current_location != "CS":
@@ -494,35 +543,13 @@ while run:
         if current_time - exit_time >= cooldown_duration:
             car_shop_exited = False 
 
-
-    # --- WAREHOUSE ---
-    if current_location == "WH" and not warehouse_exited:
-        WIN.blit(WAREHOUSEUI, (75, 225))
-        parcelButton.drawButton()
-        warehouseQuitButton.drawButton()
-
-        if warehouseQuitButton.clickButton(events):
-            current_location = None
-            warehouse_exited = True 
-            exit_time = pygame.time.get_ticks()
-        
-        if parcelButton.clickButton(events):
-            currentParcels = giveParcels(carCapacity[carNumber])
-            print(currentParcels)
-            warehouse_exited = True 
-
-
-    if warehouse_exited and current_location != "WH":
-        current_time = pygame.time.get_ticks()
-        if current_time - exit_time >= cooldown_duration:
-            warehouse_exited = False 
-
     # --- DELIVERYS ---
     if currentParcels:  # Check if there are parcels to deliver
         if current_location == currentParcels[0]:  # Check if the player is at the first delivery location
             playerCoins, coinsGain = payPlayer(playerCoins, currentParcels[0], CarDeliveryMultiplier[carNumber])
             currentParcels.pop(0)  # Remove the delivered location from the list
-            print(f"Delivered! Remaining parcels: {currentParcels}")
+            print("Delivered! Remaining parcels: " + str(currentParcels))
+            COIN_GAIN_SOUND.play()
 
         
 
