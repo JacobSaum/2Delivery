@@ -45,8 +45,8 @@ WAREHOUSEUI = scale_image(pygame.image.load("imgs/WarehouseUI.png"), 0.085)
 PARCELBUTTON = scale_image(pygame.image.load("imgs/WarehouseParcelButton.png"), 0.04)
 
 UIEXITBUTTON = scale_image(pygame.image.load("imgs/MenuExitButton.png"), 0.008)
-MAPBUTTON = scale_image(pygame.image.load("imgs/MapButton.png"), 0.008)
-MAPUI = scale_image(pygame.image.load("imgs/LocationMap.png"), 1)
+MAPBUTTON = scale_image(pygame.image.load("imgs/MapButton.png"), 0.019)
+MAPUI = scale_image(pygame.image.load("imgs/LocationMap.png"), 0.85)
 
 # --- DELIVERY COLLISION MASKS ---
 
@@ -97,7 +97,7 @@ M10 = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions
 
 # Import Fonts
 UI_FONT = pygame.font.Font("fonts/PixelifySans-SemiBold.ttf", 36)
-
+SMALL_UI_FONT = pygame.font.Font("fonts/PixelifySans-SemiBold.ttf", 14)
 # -- ANIMATIONS --
 
 # -- SOUNDS --
@@ -326,7 +326,10 @@ volumeOnButtonMenu = Button(1070, 20, VOLONBUTTON)
 volumeOffButtonMenu = Button(1070, 20, VOLOFFBUTTON)
 quit_button_menu = Button(1070,895, QUIT_BUTTON)
 
-UI_Quit_Button = Button(860, 200, UIEXITBUTTON)
+uiQuitButton = Button(860, 200, UIEXITBUTTON)
+mapQuitButton = Button(865, 55, UIEXITBUTTON)
+carShopQuitButton = Button(860, 200, UIEXITBUTTON)
+warehouseQuitButton = Button(860, 200, UIEXITBUTTON)
 
 #carShopBuyButton = Button(x,x, BUYBUTTON)
 parcelButton = Button(300, 400, PARCELBUTTON)
@@ -337,7 +340,8 @@ run = True
 car_shop_exited = False  # Track if the player has exited the Car Shop UI
 warehouse_exited = False # Track if the player has exited the Warehouse UI
 exit_time = 0  # Timestamp when the player exited
-cooldown_duration = 2000  # Cooldown duration in milliseconds (1 second)
+cooldown_duration = 2000  # cooldown duration for driving actuated ui elements
+map_cooldown_duration = 1000 # cooldown duration for map ui
 
 currentParcels = []
 
@@ -460,17 +464,19 @@ while run:
         if volumeOffButton.clickButton(events):
             volumeBool = True
             pygame.mixer.music.unpause()
+    
 
+    # --- MAP BUTTON ---
     mapButton.drawButton()
     if mapButton.clickButton(events):  # Pass events to check for clicks
         map_ui_open = True  # Open the map UI
 
     if map_ui_open:  # Only draw the map UI if it's open
-        WIN.blit(MAPUI, (75, 225))  # Draw the map UI
-        UI_Quit_Button.drawButton()
+        WIN.blit(MAPUI, (75, 75))  # Draw the map UI
+        mapQuitButton.drawButton()
 
-    # Quit button for map UI
-        if UI_Quit_Button.clickButton(events):
+        # Quit button for map UI
+        if mapQuitButton.clickButton(events):
             map_ui_open = False  # Close the map UI
    
 
@@ -478,9 +484,9 @@ while run:
     # --- CAR SHOP ---
     if current_location == "CS" and not car_shop_exited:
         WIN.blit(CARSHOPUI, (75, 225))
-        UI_Quit_Button.drawButton()
+        carShopQuitButton.drawButton()
 
-        if UI_Quit_Button.clickButton(events):
+        if carShopQuitButton.clickButton(events):
             current_location = None
             car_shop_exited = True 
             exit_time = pygame.time.get_ticks()
@@ -495,9 +501,9 @@ while run:
     if current_location == "WH" and not warehouse_exited:
         WIN.blit(WAREHOUSEUI, (75, 225))
         parcelButton.drawButton()
-        UI_Quit_Button.drawButton()
+        warehouseQuitButton.drawButton()
 
-        if UI_Quit_Button.clickButton(events):
+        if warehouseQuitButton.clickButton(events):
             current_location = None
             warehouse_exited = True 
             exit_time = pygame.time.get_ticks()
@@ -525,13 +531,23 @@ while run:
      # Redraw Text
     coinsText = UI_FONT.render(str(playerCoins), False, (0, 0, 0))
     WIN.blit(coinsText, (1120, 130))
+
     parcelsText = UI_FONT.render(str((len(currentParcels))) + " / " + str(capacity), False, (0, 0, 0))
     WIN.blit(parcelsText, (1120, 242))
+
     if currentParcels:
         deliveryLocationText = UI_FONT.render(currentParcels[0], False, (0, 0, 0))
     else:
         deliveryLocationText = UI_FONT.render("N/A", False, (0, 0, 0))
-    WIN.blit(deliveryLocationText, (1120, 357))  # Always display the text
+
+    WIN.blit(deliveryLocationText, (1120, 375))  # Always display the text
+
+    nextDeliveryLocationText1 = SMALL_UI_FONT.render("Next Delivery", False, (0, 0, 0))
+    WIN.blit(nextDeliveryLocationText1, (1120, 355))
+    
+    nextDeliveryLocationText2 = SMALL_UI_FONT.render("Location:", False, (0, 0, 0))
+    WIN.blit(nextDeliveryLocationText2, (1120, 365))
+
     speedText = UI_FONT.render(str(round(player_car.vel, 1)) + "px/s", False, (0, 0, 0))
     WIN.blit(speedText, (1120, 470))
         
