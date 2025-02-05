@@ -3,8 +3,8 @@
 --------------------
 
 - Fix Collision System 
-- Money System
-- Car Buying System
-- Car stats System
-- "buynextcar" function
+- Add dlivery animation
+- If map button clicked again while its open, close map ui
+- Rescale cars
+- Add toutorial button / ui
 - + TONS more 

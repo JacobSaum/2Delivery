@@ -23,8 +23,8 @@ MAP_COLLISIONS_MASK = pygame.mask.from_surface(MAP_COLLISIONS)
 
 # Import veicle images 
 MOPED = scale_image(pygame.image.load("imgs/RedMoped.png"), 0.0027)
-PICKUP = scale_image(pygame.image.load("imgs/OrangePickup.png"), 0.0035)
-VAN = scale_image(pygame.image.load("imgs/BlueVan.png"), 0.003)
+PICKUP = scale_image(pygame.image.load("imgs/OrangePickup.png"), 0.003)
+VAN = scale_image(pygame.image.load("imgs/BlueVan.png"), 0.0031)
 LORRY = scale_image(pygame.image.load("imgs/GreenLorry.png"), 0.004)
 UFO = scale_image(pygame.image.load("imgs/Ufo.png"), 0.0025)
 
@@ -147,7 +147,7 @@ print(carPrices)
 
 # --- COINS SYSTEM ---
 
-startingCoins = 5000
+startingCoins = 0
 
 playerCoins = startingCoins
 
@@ -234,7 +234,7 @@ class AbstractCar:
 class playerCar(AbstractCar):
     def __init__(self, max_vel, rotation_vel, car_image):
         self.IMG = car_image  # Set the car image dynamically
-        self.START_POS = (75, 75)  # Define the starting position
+        self.START_POS = (648, 720)  # Define the starting position
         super().__init__(max_vel, rotation_vel, self.START_POS)  # Pass START_POS to the parent class
 
     def bounce(self):
@@ -269,10 +269,10 @@ def get_current_delivery_location(player_car):
 
 # Warehouse - Give parcels button function
 def giveParcels(capacity):
-    deliveryLocations = ["A1", "A2", "A3", "A4", "A5",
-                            "C1", "C2", "C3",
-                            "H1", "H2", "H3", "H4", "H5", "H6", "H7", "H8", "H9", "H10", "H11", "H12", "H13", "H14",
-                            "M1", "M2", "M3", "M4", "M5", "M6", "M7", "M8", "M9", "M10"
+    deliveryLocations = ["A1", "A2", "A3", "A4", "A5", # Apartments
+                        "C1", "C2", "C3", # Cabins
+                        "H1", "H2", "H3", "H4", "H5", "H6", "H7", "H8", "H9", "H10", "H11", "H12", "H13", "H14", # Houses
+                        "M1", "M2", "M3", "M4", "M5", "M6", "M7", "M8", "M9", "M10" # Modern Houses
                         ]
 
     currentParcels = [""] * capacity
@@ -476,8 +476,8 @@ while run:
 
     # --- MAP BUTTON ---
     mapButton.drawButton()
-    if mapButton.clickButton(events):  # Pass events to check for clicks
-        map_ui_open = True  # Open the map UI
+    if mapButton.clickButton(events):  # Check if the map button is clicked
+        map_ui_open = not map_ui_open  # Toggle the map UI state
 
     if map_ui_open:  # Only draw the map UI if it's open
         WIN.blit(MAPUI, (75, 75))  # Draw the map UI
@@ -486,7 +486,7 @@ while run:
         # Quit button for map UI
         if mapQuitButton.clickButton(events):
             map_ui_open = False  # Close the map UI
-
+            
     # --- WAREHOUSE ---
     if current_location == "WH" and not warehouse_exited:
         print("Rendering Warehouse UI")  # Debug statement
