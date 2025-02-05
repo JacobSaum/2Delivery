@@ -113,25 +113,27 @@ pygame.display.set_caption("2Delivery")
 # --- CAR STATS ---
 
 carNames=[]
-carAccelerations = []
 carMaxSpeeds=[]
 carCapacity = []
 CarDeliveryMultiplier = []
 carPrices = []
 
+
+carNumber = 0
+
 csv_file = open('CarStats.csv','r') 
 for line in csv_file:                  
-    name,accell,speed,capacity,multiplier,price=line[:-1].split(',')  
+    name,speed,capacity,multiplier,price=line[:-1].split(',')  
     carNames.append(name)
-    carAccelerations.append(float(accell))
     carMaxSpeeds.append(float(speed))
     carCapacity.append(int(capacity))
     CarDeliveryMultiplier.append(float(multiplier))
     carPrices.append(int(price))
-csv_file.close()                       
+csv_file.close()  
+
+carImages = [MOPED, VAN, PICKUP, LORRY, UFO]
 
 print(carNames)
-print(carAccelerations)
 print(carMaxSpeeds)
 print(carCapacity)
 print(CarDeliveryMultiplier)
@@ -312,7 +314,7 @@ menuImages = [(MAINMENU, (0,0))]
 
 # -- PLAYER CAR --
 
-player_car = playerCar(1.5,2)
+player_car = playerCar(carMaxSpeeds[carNumber],2)
 gameInfo = GameInfo()
 
 # --- BUTTONS ---
@@ -346,10 +348,6 @@ map_cooldown_duration = 1000 # cooldown duration for map ui
 currentParcels = []
 
 map_ui_open = False
-
-# car variables
-capacity = 4
-carMultiplier = 1.5
 
 
 
@@ -509,7 +507,7 @@ while run:
             exit_time = pygame.time.get_ticks()
         
         if parcelButton.clickButton(events):
-            currentParcels = giveParcels(capacity)
+            currentParcels = giveParcels(carCapacity[carNumber])
             print(currentParcels)
             warehouse_exited = True 
 
@@ -522,7 +520,7 @@ while run:
     # --- DELIVERYS ---
     if currentParcels:  # Check if there are parcels to deliver
         if current_location == currentParcels[0]:  # Check if the player is at the first delivery location
-            playerCoins, coinsGain =payPlayer(playerCoins, currentParcels[0], carMultiplier)
+            playerCoins, coinsGain = payPlayer(playerCoins, currentParcels[0], CarDeliveryMultiplier[carNumber])
             currentParcels.pop(0)  # Remove the delivered location from the list
             print(f"Delivered! Remaining parcels: {currentParcels}")
 
@@ -532,7 +530,7 @@ while run:
     coinsText = UI_FONT.render(str(playerCoins), False, (0, 0, 0))
     WIN.blit(coinsText, (1120, 130))
 
-    parcelsText = UI_FONT.render(str((len(currentParcels))) + " / " + str(capacity), False, (0, 0, 0))
+    parcelsText = UI_FONT.render(str((len(currentParcels))) + " / " + str(carCapacity[carNumber]), False, (0, 0, 0))
     WIN.blit(parcelsText, (1120, 242))
 
     if currentParcels:
