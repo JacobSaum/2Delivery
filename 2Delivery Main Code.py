@@ -110,6 +110,7 @@ CLICK_SOUND.set_volume(0.5)
 ERROR_SOUND = pygame.mixer.Sound("sounds/ErrorSound.mp3")
 COIN_GAIN_SOUND = pygame.mixer.Sound("sounds/CoinGainSound.mp3")
 COIN_SPEND_SOUND = pygame.mixer.Sound("sounds/CoinSpendSound.wav")
+DRIVING_SOUND = pygame.mixer.Sound("sounds/carDrivingSound.mp3")
 
 WIN = pygame.display.set_mode((1280,1024))
 pygame.display.set_caption("2Delivery")
@@ -147,7 +148,7 @@ print(carPrices)
 
 # --- COINS SYSTEM ---
 
-startingCoins = 0
+startingCoins = 5000
 
 playerCoins = startingCoins
 
@@ -359,6 +360,8 @@ currentParcels = []
 
 map_ui_open = False
 
+is_driving_sound_playing = False
+
 
 
 # -- EVENT LOOP --
@@ -429,11 +432,17 @@ while run:
     if keys[pygame.K_w]:
         player_car.move_forward()
         moved = True
+        if not is_driving_sound_playing:
+            DRIVING_SOUND.play(-1)  # Loop the driving sound
+            is_driving_sound_playing = True
 
     # S Keybind
     if keys[pygame.K_s]:
         player_car.move_backward()
         moved = True
+        if not is_driving_sound_playing:
+            DRIVING_SOUND.play(-1)  # Loop the driving sound
+            is_driving_sound_playing = True
 
     # A Keybind
     if keys[pygame.K_a] and player_car.vel != 0:
@@ -446,6 +455,9 @@ while run:
     # Gradually slowing stop for player car
     if not moved:
         player_car.reduce_speed()
+        if is_driving_sound_playing:
+            DRIVING_SOUND.stop()
+            is_driving_sound_playing = False
 
     # Check for collisions
     if player_car.collide(MAP_COLLISIONS_MASK) is not None:
@@ -512,7 +524,6 @@ while run:
         if current_time - exit_time >= cooldown_duration:
             warehouse_exited = False
    
-
 
     # --- CAR SHOP ---
     if current_location == "CS" and not car_shop_exited:

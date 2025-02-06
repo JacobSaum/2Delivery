@@ -3,8 +3,6 @@
 --------------------
 
 - Fix Collision System 
-- Add dlivery animation
-- If map button clicked again while its open, close map ui
-- Rescale cars
+- Add delivery animation
 - Add toutorial button / ui
 - + TONS more 
