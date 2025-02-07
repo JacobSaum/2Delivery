@@ -48,6 +48,7 @@ PARCELBUTTON = scale_image(pygame.image.load("imgs/WarehouseParcelButton.png"), 
 UIEXITBUTTON = scale_image(pygame.image.load("imgs/MenuExitButton.png"), 0.008)
 MAPBUTTON = scale_image(pygame.image.load("imgs/MapButton.png"), 0.019)
 MAPUI = scale_image(pygame.image.load("imgs/LocationMap.png"), 0.85)
+HELPBUTTON = scale_image(pygame.image.load("imgs/HelpButton.png"), 0.019)
 
 # --- DELIVERY COLLISION MASKS ---
 
@@ -106,11 +107,13 @@ STATS_UI_FONT = pygame.font.Font("fonts/PixelifySans-SemiBold.ttf", 27)
 # -- SOUNDS --
 
 CLICK_SOUND = pygame.mixer.Sound("sounds/blipSelect.wav")
-CLICK_SOUND.set_volume(0.5)
 ERROR_SOUND = pygame.mixer.Sound("sounds/ErrorSound.mp3")
 COIN_GAIN_SOUND = pygame.mixer.Sound("sounds/CoinGainSound.mp3")
 COIN_SPEND_SOUND = pygame.mixer.Sound("sounds/CoinSpendSound.wav")
 DRIVING_SOUND = pygame.mixer.Sound("sounds/carDrivingSound.mp3")
+
+CLICK_SOUND.set_volume(0.5)
+DRIVING_SOUND.set_volume(0.2)
 
 WIN = pygame.display.set_mode((1280,1024))
 pygame.display.set_caption("2Delivery")
@@ -325,11 +328,13 @@ menuImages = [(MAINMENU, (0,0))]
 player_car = playerCar(carMaxSpeeds[carNumber], 2, carImages[carNumber])
 gameInfo = GameInfo()
 
+
 # --- BUTTONS ---
-quit_Button = Button(1048, 875, QUIT_BUTTON)
-volumeOnButton = Button(1048, 765, VOLONBUTTON)
-volumeOffButton = Button(1048, 765, VOLOFFBUTTON)
-mapButton = Button(1048,655,MAPBUTTON)
+quit_Button = Button(1048, 880, QUIT_BUTTON)
+volumeOnButton = Button(1048, 780, VOLONBUTTON)
+volumeOffButton = Button(1048, 780, VOLOFFBUTTON)
+mapButton = Button(1048, 680, MAPBUTTON)
+helpButton = Button(1048, 580, HELPBUTTON)
 
 play_button = Button(575, 627, PLAY_BUTTON)
 volumeOnButtonMenu = Button(1070, 20, VOLONBUTTON)
@@ -359,12 +364,17 @@ map_cooldown_duration = 1000 # cooldown duration for map ui
 currentParcels = []
 
 map_ui_open = False
+help_ui_open = False
 
 is_driving_sound_playing = False
 
 
 
-# -- EVENT LOOP --
+
+
+
+
+# ------------ EVENT LOOP ---------------
 while run:
     # set clock speed
     clock.tick(FPS)
@@ -498,6 +508,19 @@ while run:
         # Quit button for map UI
         if mapQuitButton.clickButton(events):
             map_ui_open = False  # Close the map UI
+
+    # --- HELP BUTTON ---
+    helpButton.drawButton()
+    if helpButton.clickButton(events):  # Check if the map button is clicked
+        help_ui_open = not help_ui_open  # Toggle the map UI state
+
+    if help_ui_open:  # Only draw the map UI if it's open
+        WIN.blit(MAPUI, (75, 75))  # Draw the map UI
+        mapQuitButton.drawButton()
+
+        # Quit button for map UI
+        if mapQuitButton.clickButton(events):
+            help_ui_open = False  # Close the map UI
             
     # --- WAREHOUSE ---
     if current_location == "WH" and not warehouse_exited:
