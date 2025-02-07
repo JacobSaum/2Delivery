@@ -98,10 +98,11 @@ M10 = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions
 
 
 # Import Fonts
-UI_FONT = pygame.font.Font("fonts/PixelifySans-SemiBold.ttf", 36)
-SMALL_UI_FONT = pygame.font.Font("fonts/PixelifySans-SemiBold.ttf", 14)
-LARGE_UI_FONT = pygame.font.Font("fonts/PixelifySans-SemiBold.ttf", 70)
-STATS_UI_FONT = pygame.font.Font("fonts/PixelifySans-SemiBold.ttf", 27)
+FONTFILENAME = "fonts/RasterForgeRegular.ttf"
+UI_FONT = pygame.font.Font(FONTFILENAME , 36)
+SMALL_UI_FONT = pygame.font.Font(FONTFILENAME, 14)
+LARGE_UI_FONT = pygame.font.Font(FONTFILENAME, 70)
+STATS_UI_FONT = pygame.font.Font(FONTFILENAME, 27)
 # -- ANIMATIONS --
 
 # -- SOUNDS --
@@ -636,7 +637,7 @@ while run:
         
 
      # Redraw Text
-    coinsText = UI_FONT.render(str(playerCoins), False, (0, 0, 0))
+    coinsText = UI_FONT.render(str(round(playerCoins, 0)), False, (0, 0, 0))
     WIN.blit(coinsText, (1120, 130))
 
     parcelsText = UI_FONT.render(str((len(currentParcels))) + " / " + str(carCapacity[carNumber]), False, (0, 0, 0))
