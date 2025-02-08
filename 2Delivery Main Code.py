@@ -50,7 +50,9 @@ PARCELBUTTON = scale_image(pygame.image.load("imgs/WarehouseParcelButton.png"), 
 UIEXITBUTTON = scale_image(pygame.image.load("imgs/MenuExitButton.png"), 0.008)
 MAPBUTTON = scale_image(pygame.image.load("imgs/MapButton.png"), 0.019)
 MAPUI = scale_image(pygame.image.load("imgs/LocationMap.png"), 0.85)
+
 HELPBUTTON = scale_image(pygame.image.load("imgs/HelpButton.png"), 0.019)
+HELPUI = scale_image(pygame.image.load("imgs/helpUI.png"), 0.85)
 
 # --- DELIVERY COLLISION MASKS ---
 
@@ -243,8 +245,8 @@ class AbstractCar:
 class playerCar(AbstractCar):
     def __init__(self, max_vel, rotation_vel, car_image):
         self.IMG = car_image  # Set the car image dynamically
-        #self.START_POS = (648, 720)  # Define the starting position
-        self.START_POS = (80, 80) # TEMP
+        self.START_POS = (648, 720)  # Define the starting position
+        #self.START_POS = (80, 80) # TESTING
 
         super().__init__(max_vel, rotation_vel, self.START_POS)  # Pass START_POS to the parent class
 
@@ -350,7 +352,7 @@ quit_button_menu = Button(1070,895, QUIT_BUTTON)
 
 uiQuitButton = Button(860, 200, UIEXITBUTTON)
 
-mapQuitButton = Button(865, 55, UIEXITBUTTON)
+ButtonUIQuitButton = Button(865, 55, UIEXITBUTTON)
 
 carShopQuitButton = Button(860, 200, UIEXITBUTTON)
 BuyButton = Button(500, 585, BUYBUTTON)
@@ -510,10 +512,10 @@ while run:
 
     if map_ui_open:  # Only draw the map UI if it's open
         WIN.blit(MAPUI, (75, 75))  # Draw the map UI
-        mapQuitButton.drawButton()
+        ButtonUIQuitButton.drawButton()
 
         # Quit button for map UI
-        if mapQuitButton.clickButton(events):
+        if ButtonUIQuitButton.clickButton(events):
             map_ui_open = False  # Close the map UI
 
     # --- HELP BUTTON ---
@@ -522,11 +524,11 @@ while run:
         help_ui_open = not help_ui_open  # Toggle the map UI state
 
     if help_ui_open:  # Only draw the map UI if it's open
-        WIN.blit(MAPUI, (75, 75))  # Draw the map UI
-        mapQuitButton.drawButton()
+        WIN.blit(HELPUI, (75, 75))  # Draw the map UI
+        ButtonUIQuitButton.drawButton()
 
         # Quit button for map UI
-        if mapQuitButton.clickButton(events):
+        if ButtonUIQuitButton.clickButton(events):
             help_ui_open = False  # Close the map UI
             
     # --- WAREHOUSE ---
