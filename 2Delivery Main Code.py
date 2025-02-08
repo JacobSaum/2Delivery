@@ -99,10 +99,12 @@ M10 = pygame.mask.from_surface(scale_image(pygame.image.load("DeliveryColissions
 
 # Import Fonts
 FONTFILENAME = "fonts/RasterForgeRegular.ttf"
-UI_FONT = pygame.font.Font(FONTFILENAME , 36)
+UI_FONT = pygame.font.Font(FONTFILENAME , 32)
+SPEED_UI_FONT = pygame.font.Font(FONTFILENAME , 22)
 SMALL_UI_FONT = pygame.font.Font(FONTFILENAME, 14)
 LARGE_UI_FONT = pygame.font.Font(FONTFILENAME, 70)
 STATS_UI_FONT = pygame.font.Font(FONTFILENAME, 27)
+PRICE_UI_FONT = pygame.font.Font(FONTFILENAME, 55)
 # -- ANIMATIONS --
 
 # -- SOUNDS --
@@ -150,7 +152,7 @@ print(carCapacity)
 print(CarDeliveryMultiplier)
 print(carPrices)
 
-# --- COINS SYSTEM ---
+# --- COINS SYSTEM --- 
 
 startingCoins = 5000
 
@@ -239,7 +241,9 @@ class AbstractCar:
 class playerCar(AbstractCar):
     def __init__(self, max_vel, rotation_vel, car_image):
         self.IMG = car_image  # Set the car image dynamically
-        self.START_POS = (648, 720)  # Define the starting position
+        #self.START_POS = (648, 720)  # Define the starting position
+        self.START_POS = (80, 80) # TEMP
+
         super().__init__(max_vel, rotation_vel, self.START_POS)  # Pass START_POS to the parent class
 
     def bounce(self):
@@ -558,10 +562,17 @@ while run:
         if carNumber < len(carPrices) - 1:  # Check if there is a next car to buy
             next_car_price = carPrices[carNumber + 1]  # Get the price of the next car
 
-            price_text = LARGE_UI_FONT.render(str(next_car_price), False, (0, 0, 0))
-            speedStatstext = STATS_UI_FONT.render("Max Speed: " + str(carMaxSpeeds[carNumber + 1]), False, (0, 0, 0))
-            capactiyStats = STATS_UI_FONT.render("Capacity: " + str(carCapacity[carNumber + 1]), False, (0, 0, 0))
-            carMultiplierStats = STATS_UI_FONT.render("Multiplier: " + str(CarDeliveryMultiplier[carNumber + 1]), False, (0, 0, 0))
+            price_text = PRICE_UI_FONT.render(str(next_car_price), False, (0, 0, 0))
+
+            speedStatsText = STATS_UI_FONT.render("Max Speed", False, (0, 0, 0))
+            speedStatsText2 = UI_FONT.render(str(carMaxSpeeds[carNumber + 1]*20) + "px/s", False, (140, 25, 25))
+
+            capactiyStats = STATS_UI_FONT.render("Capacity", False, (0, 0, 0))
+            capacityStats2 = UI_FONT.render(str(carCapacity[carNumber + 1]), False, (140, 25, 25))
+
+            carMultiplierStats = STATS_UI_FONT.render("Multiplier", False, (0, 0, 0))
+            carMultiplierStats2 = UI_FONT.render(str(CarDeliveryMultiplier[carNumber + 1]) + "x", False, (140, 25, 25))
+
             carnameStats = LARGE_UI_FONT.render(str(carNames[carNumber + 1]), False, (0, 0, 0))
 
             if playerCoins >= next_car_price:
@@ -598,23 +609,26 @@ while run:
                     ERROR_SOUND.play()
 
         else:
-            price_text = LARGE_UI_FONT.render("N/A", False, (0, 0, 0))
-            speedStatstext = STATS_UI_FONT.render("Max Speed: N/A ", False, (0, 0, 0))
-            capactiyStats = STATS_UI_FONT.render("Capacity: N/A", False, (0, 0, 0))                      
-            carMultiplierStats = STATS_UI_FONT.render("Multiplier: N/A", False, (0, 0, 0))
+            price_text = PRICE_UI_FONT.render("N/A", False, (0, 0, 0))
+            speedStatsText2 = STATS_UI_FONT.render("N/A ", False, (140, 25, 25))
+            capacityStats2 = STATS_UI_FONT.render("N/A", False, (140, 25, 25))                      
+            carMultiplierStats2 = STATS_UI_FONT.render("N/A", False, (140, 25, 25))
             carnameStats = LARGE_UI_FONT.render("N/A", False, (0, 0, 0))
 
 
         # Display Max Speed Stats
-        WIN.blit(speedStatstext, (140, 540))
+        WIN.blit(speedStatsText, (140, 540))
+        WIN.blit(speedStatsText2, (140, 560))
         # Display Capacity Stats
-        WIN.blit(capactiyStats, (140, 590))
+        WIN.blit(capactiyStats, (140, 600))
+        WIN.blit(capacityStats2, (140, 620))
         # Display Car Multiplier Stats
-        WIN.blit(carMultiplierStats, (140, 640))
+        WIN.blit(carMultiplierStats, (140, 660))
+        WIN.blit(carMultiplierStats2, (140, 680))
         # Display car name
-        WIN.blit(carnameStats, (380, 335))
+        WIN.blit(carnameStats, (380, 348))
         # Display car price
-        WIN.blit(price_text, (575, 450))
+        WIN.blit(price_text, (575, 467))
 
         if carShopQuitButton.clickButton(events):
             current_location = None
@@ -638,26 +652,26 @@ while run:
 
      # Redraw Text
     coinsText = UI_FONT.render(str(round(playerCoins, 0)), False, (0, 0, 0))
-    WIN.blit(coinsText, (1120, 130))
+    WIN.blit(coinsText, (1120, 140))
 
     parcelsText = UI_FONT.render(str((len(currentParcels))) + " / " + str(carCapacity[carNumber]), False, (0, 0, 0))
-    WIN.blit(parcelsText, (1120, 242))
+    WIN.blit(parcelsText, (1120, 255))
 
     if currentParcels:
         deliveryLocationText = UI_FONT.render(currentParcels[0], False, (0, 0, 0))
     else:
         deliveryLocationText = UI_FONT.render("N/A", False, (0, 0, 0))
 
-    WIN.blit(deliveryLocationText, (1120, 375))  # Always display the text
+    WIN.blit(deliveryLocationText, (1120, 382))  # Always display the text
 
     nextDeliveryLocationText1 = SMALL_UI_FONT.render("Next Delivery", False, (0, 0, 0))
-    WIN.blit(nextDeliveryLocationText1, (1120, 355))
+    WIN.blit(nextDeliveryLocationText1, (1120, 360))
     
     nextDeliveryLocationText2 = SMALL_UI_FONT.render("Location:", False, (0, 0, 0))
-    WIN.blit(nextDeliveryLocationText2, (1120, 365))
+    WIN.blit(nextDeliveryLocationText2, (1120, 370))
 
-    speedText = UI_FONT.render(str(round(player_car.vel, 1)) + "px/s", False, (0, 0, 0))
-    WIN.blit(speedText, (1120, 470))
+    speedText = SPEED_UI_FONT.render(str(round(player_car.vel*20, 1)) + "px/s", False, (0, 0, 0))
+    WIN.blit(speedText, (1120, 485))
         
     # Update display
     pygame.display.update()
