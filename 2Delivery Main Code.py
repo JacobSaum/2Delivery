@@ -26,7 +26,9 @@ MOPED = scale_image(pygame.image.load("imgs/RedMoped.png"), 0.0027)
 PICKUP = scale_image(pygame.image.load("imgs/OrangePickup.png"), 0.003)
 VAN = scale_image(pygame.image.load("imgs/BlueVan.png"), 0.0031)
 LORRY = scale_image(pygame.image.load("imgs/GreenLorry.png"), 0.004)
-UFO = scale_image(pygame.image.load("imgs/Ufo.png"), 0.0025)
+SPORTSCAR = scale_image(pygame.image.load("imgs/SportsCar.png"), 0.0032)
+
+
 
 # Import User Interface Images
 UIBACKGROUND = scale_image(pygame.image.load("imgs/UI BG.png"), 0.1038)
@@ -144,7 +146,7 @@ for line in csv_file:
     carPrices.append(int(price))
 csv_file.close()  
 
-carImages = [MOPED, PICKUP, VAN, LORRY, UFO]
+carImages = [MOPED, PICKUP, VAN, LORRY, SPORTSCAR]
 
 print(carNames)
 print(carMaxSpeeds)
@@ -614,7 +616,9 @@ while run:
             capacityStats2 = STATS_UI_FONT.render("N/A", False, (140, 25, 25))                      
             carMultiplierStats2 = STATS_UI_FONT.render("N/A", False, (140, 25, 25))
             carnameStats = LARGE_UI_FONT.render("N/A", False, (0, 0, 0))
-
+            WIN.blit((PRICE_UI_FONT.render("No Cars", False, (0, 0, 0))), (480, 580))
+            WIN.blit((PRICE_UI_FONT.render("Available To", False, (0, 0, 0))), (400, 640))
+            WIN.blit((PRICE_UI_FONT.render("Purchase!", False, (0, 0, 0))), (440, 700))
 
         # Display Max Speed Stats
         WIN.blit(speedStatsText, (140, 540))
