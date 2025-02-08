@@ -339,27 +339,34 @@ gameInfo = GameInfo()
 
 
 # --- BUTTONS ---
+# menu buttons
 quit_Button = Button(1048, 880, QUIT_BUTTON)
 volumeOnButton = Button(1048, 780, VOLONBUTTON)
 volumeOffButton = Button(1048, 780, VOLOFFBUTTON)
 mapButton = Button(1048, 680, MAPBUTTON)
 helpButton = Button(1048, 580, HELPBUTTON)
 
+# menu buttons
 play_button = Button(575, 627, PLAY_BUTTON)
 volumeOnButtonMenu = Button(1070, 20, VOLONBUTTON)
 volumeOffButtonMenu = Button(1070, 20, VOLOFFBUTTON)
 quit_button_menu = Button(1070,895, QUIT_BUTTON)
+menuHelpButton = Button(1070, 130, HELPBUTTON)
 
+# ui quit buttons
 uiQuitButton = Button(860, 200, UIEXITBUTTON)
-
 ButtonUIQuitButton = Button(865, 55, UIEXITBUTTON)
+menuHelpQuitButton = Button(965, 55, UIEXITBUTTON)
 
+# car shop buttons
 carShopQuitButton = Button(860, 200, UIEXITBUTTON)
 BuyButton = Button(500, 585, BUYBUTTON)
 GreyDrawButton = Button(500, 585, GREYBUYBUTTON)
 
+#warehouse buttons
 warehouseQuitButton = Button(860, 200, UIEXITBUTTON)
 parcelButton = Button(300, 400, PARCELBUTTON)
+
 
 # Variables
 run = True
@@ -374,6 +381,7 @@ currentParcels = []
 
 map_ui_open = False
 help_ui_open = False
+menuHelpButtonOpen = False
 
 is_driving_sound_playing = False
 
@@ -401,19 +409,36 @@ while run:
     if not gameInfo.started:
         drawMenu(WIN, menuImages)
 
+        # Menu quit button
         quit_button_menu.drawButton()
         if quit_button_menu.clickButton(events):
             pygame.time.wait(250)
             run = False
             break
-
+        
+        # Menu play button
         play_button.drawButton()
         if volumeBool:
             volumeOnButtonMenu.drawButton()
         else:
             volumeOffButtonMenu.drawButton()
-        pygame.display.update()
 
+        # Handle menu help button click
+        menuHelpButton.drawButton()
+        if menuHelpButton.clickButton(events):
+            menuHelpButtonOpen = not menuHelpButtonOpen
+        
+        if menuHelpButtonOpen:
+            WIN.blit(HELPUI, (175, 75))  # Draw the help UI
+            menuHelpQuitButton.drawButton()
+
+            # Handle quit button click for the help UI
+            if menuHelpQuitButton.clickButton(events):
+                menuHelpButtonOpen = False  # Close the help UI
+
+        
+
+        # Menu Music
         if not pygame.mixer.music.get_busy() and volumeBool:
             pygame.mixer.music.load("sounds/Menu Music.mp3")
             pygame.mixer.music.play(-1, 0.0)
@@ -439,6 +464,9 @@ while run:
         elif not volumeBool and volumeOffButtonMenu.clickButton(events):
             volumeBool = True
             pygame.mixer.music.unpause()
+        
+        # Update Menu ONCE every frame
+        pygame.display.update()
 
         continue  # Skip game logic while in the menu
 
