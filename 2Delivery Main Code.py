@@ -122,6 +122,11 @@ DRIVING_SOUND = pygame.mixer.Sound("sounds/carDrivingSound.mp3")
 CLICK_SOUND.set_volume(0.5)
 DRIVING_SOUND.set_volume(0.2)
 
+
+# --- UI GREY TRANSPARENT BG ---
+TRANSPARENT_GREY = pygame.Surface((1280, 1024), pygame.SRCALPHA)
+TRANSPARENT_GREY.fill((33, 33, 33, 170))  # Grey with 50% transparency
+
 WIN = pygame.display.set_mode((1280,1024))
 pygame.display.set_caption("2Delivery")
 
@@ -388,6 +393,8 @@ currentParcels = []
 map_ui_open = False
 help_ui_open = False
 menuHelpButtonOpen = False
+car_ui_open = False
+wh_ui_open = False
 
 is_driving_sound_playing = False
 
@@ -537,10 +544,17 @@ while run:
         if volumeOffButton.clickButton(events):
             volumeBool = True
             pygame.mixer.music.unpause()
-    
+
+    # --- DRAW BUTTONS ---
+    helpButton.drawButton()
+    mapButton.drawButton()
+
+    # --- UI GREY BG ---
+    if map_ui_open or help_ui_open or car_ui_open or wh_ui_open:
+        WIN.blit(TRANSPARENT_GREY, (0, 0))  # Draw the transparent grey surface
 
     # --- MAP BUTTON ---
-    mapButton.drawButton()
+    
     if mapButton.clickButton(events):  # Check if the map button is clicked
         map_ui_open = not map_ui_open  # Toggle the map UI state
 
@@ -553,7 +567,7 @@ while run:
             map_ui_open = False  # Close the map UI
 
     # --- HELP BUTTON ---
-    helpButton.drawButton()
+    
     if helpButton.clickButton(events):  # Check if the map button is clicked
         help_ui_open = not help_ui_open  # Toggle the map UI state
 
@@ -564,13 +578,38 @@ while run:
         # Quit button for map UI
         if ButtonUIQuitButton.clickButton(events):
             help_ui_open = False  # Close the map UI
-            
+
+
+    # Redraw Text
+    coinsText = UI_FONT.render(str(round(playerCoins, 0)), False, (0, 0, 0))
+    WIN.blit(coinsText, (1120, 140))
+
+    parcelsText = UI_FONT.render(str((len(currentParcels))) + " / " + str(carCapacity[carNumber]), False, (0, 0, 0))
+    WIN.blit(parcelsText, (1120, 255))
+
+    if currentParcels:
+        deliveryLocationText = UI_FONT.render(currentParcels[0], False, (0, 0, 0))
+    else:
+        deliveryLocationText = UI_FONT.render("N/A", False, (0, 0, 0))
+
+    WIN.blit(deliveryLocationText, (1120, 382))  # Always display the text
+
+    nextDeliveryLocationText1 = SMALL_UI_FONT.render("Next Delivery", False, (0, 0, 0))
+    WIN.blit(nextDeliveryLocationText1, (1120, 360))
+    
+    nextDeliveryLocationText2 = SMALL_UI_FONT.render("Location:", False, (0, 0, 0))
+    WIN.blit(nextDeliveryLocationText2, (1120, 370))
+
+    speedText = SPEED_UI_FONT.render(str(round(player_car.vel*20, 1)) + "px/s", False, (0, 0, 0))
+    WIN.blit(speedText, (1120, 485))
+
     # --- WAREHOUSE ---
     if current_location == "WH" and not warehouse_exited:
         print("Rendering Warehouse UI")  # Debug statement
         WIN.blit(WAREHOUSEUI, (75, 225))  # Draw the warehouse UI
         warehouseQuitButton.drawButton()  # Draw the quit button
         parcelButton.drawButton()  # Draw the parcel button
+        wh_ui_open = True
 
         # Handle quit button click
         if warehouseQuitButton.clickButton(events):
@@ -583,6 +622,8 @@ while run:
             currentParcels = giveParcels(carCapacity[carNumber])
             print(f"Parcels Assigned: {currentParcels}")
             warehouse_exited = True
+    else:
+        wh_ui_open = False
 
     # Reset warehouse_exited after cooldown
     if warehouse_exited and current_location != "WH":
@@ -595,6 +636,7 @@ while run:
     if current_location == "CS" and not car_shop_exited:
         WIN.blit(CARSHOPUI, (75, 225))
         carShopQuitButton.drawButton()
+        car_ui_open = True
 
         # Ensure carNumber is within the valid range
         if carNumber < len(carPrices) - 1:  # Check if there is a next car to buy
@@ -675,6 +717,9 @@ while run:
             car_shop_exited = True
             exit_time = pygame.time.get_ticks()
 
+    else:
+        car_ui_open = False
+
     if car_shop_exited and current_location != "CS":
         current_time = pygame.time.get_ticks()
         if current_time - exit_time >= cooldown_duration:
@@ -687,31 +732,6 @@ while run:
             currentParcels.pop(0)  # Remove the delivered location from the list
             print("Delivered! Remaining parcels: " + str(currentParcels))
             COIN_GAIN_SOUND.play()
-
-        
-
-     # Redraw Text
-    coinsText = UI_FONT.render(str(round(playerCoins, 0)), False, (0, 0, 0))
-    WIN.blit(coinsText, (1120, 140))
-
-    parcelsText = UI_FONT.render(str((len(currentParcels))) + " / " + str(carCapacity[carNumber]), False, (0, 0, 0))
-    WIN.blit(parcelsText, (1120, 255))
-
-    if currentParcels:
-        deliveryLocationText = UI_FONT.render(currentParcels[0], False, (0, 0, 0))
-    else:
-        deliveryLocationText = UI_FONT.render("N/A", False, (0, 0, 0))
-
-    WIN.blit(deliveryLocationText, (1120, 382))  # Always display the text
-
-    nextDeliveryLocationText1 = SMALL_UI_FONT.render("Next Delivery", False, (0, 0, 0))
-    WIN.blit(nextDeliveryLocationText1, (1120, 360))
-    
-    nextDeliveryLocationText2 = SMALL_UI_FONT.render("Location:", False, (0, 0, 0))
-    WIN.blit(nextDeliveryLocationText2, (1120, 370))
-
-    speedText = SPEED_UI_FONT.render(str(round(player_car.vel*20, 1)) + "px/s", False, (0, 0, 0))
-    WIN.blit(speedText, (1120, 485))
         
     # Update display
     pygame.display.update()
