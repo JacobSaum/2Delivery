@@ -17,7 +17,7 @@ from Functions import blit_rotate_centre
 #------------------- FILE LOADING -------------------
 
 # Import map image
-MAP = scale_image(pygame.image.load("imgs/MainMap.png"), 1.005)
+MAP = scale_image(pygame.image.load("imgs/MainMap.png"), 0.1005)
 MAP_COLLISIONS = scale_image(pygame.image.load("imgs/CollisionMap.png"), 0.1005)
 MAP_COLLISIONS_MASK = pygame.mask.from_surface(MAP_COLLISIONS)
 
@@ -232,13 +232,15 @@ class AbstractCar:
         self.x -= horizontal
 
     def get_rotated_mask(self):
-        # Rotate the image and create a new mask from the rotated image
-        rotated_image = pygame.transform.rotate(self.img, self.angle)
-        return pygame.mask.from_surface(rotated_image)
+        # Rotate the image and get the new rect
+        rotated_image, new_rect = blit_rotate_centre(None, self.img, (self.x, self.y), self.angle)
+    
+        # Create a mask from the rotated image
+        return pygame.mask.from_surface(rotated_image), new_rect.topleft
 
     def collide(self, mask, x=0, y=0):
-        car_mask = self.get_rotated_mask()  # Use the rotated mask
-        offset = (int(self.x - x), int(self.y - y))
+        car_mask, mask_pos = self.get_rotated_mask()
+        offset = (int(mask_pos[0] - x), int(mask_pos[1] - y))
         poi = mask.overlap(car_mask, offset)
         return poi
 
