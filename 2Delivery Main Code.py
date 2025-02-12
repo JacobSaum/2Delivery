@@ -204,6 +204,7 @@ class AbstractCar:
         self.angle = 0
         self.x, self.y = start_pos 
         self.acceleration = 0.05
+        self.mask = pygame.mask.from_surface(self.img)  # Original mask
 
     def rotate(self, left=False, right=False):
         if left:
@@ -230,14 +231,17 @@ class AbstractCar:
         self.y -= vertical
         self.x -= horizontal
 
-    # Collision handler
+    def get_rotated_mask(self):
+        # Rotate the image and create a new mask from the rotated image
+        rotated_image = pygame.transform.rotate(self.img, self.angle)
+        return pygame.mask.from_surface(rotated_image)
+
     def collide(self, mask, x=0, y=0):
-        car_mask = pygame.mask.from_surface(self.img)
+        car_mask = self.get_rotated_mask()  # Use the rotated mask
         offset = (int(self.x - x), int(self.y - y))
         poi = mask.overlap(car_mask, offset)
         return poi
 
-    # gradually slowing down after no button presses
     def reduce_speed(self):
         self.vel = max(self.vel - self.acceleration / 2, 0)
         self.move()
