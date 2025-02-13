@@ -394,6 +394,8 @@ map_cooldown_duration = 1000 # cooldown duration for map ui
 currentParcels = []
 
 map_ui_open = False
+map_ui_open_temp = False
+tempMapSound = False
 help_ui_open = False
 menuHelpButtonOpen = False
 car_ui_open = False
@@ -556,19 +558,33 @@ while run:
     mapButton.drawButton()
 
     # --- UI GREY BG ---
-    if map_ui_open or help_ui_open or car_ui_open or wh_ui_open:
+    if map_ui_open or map_ui_open_temp or help_ui_open or car_ui_open or wh_ui_open:
         WIN.blit(TRANSPARENT_GREY, (0, 0))  # Draw the transparent grey surface
 
     # --- MAP BUTTON ---
-    
-    if mapButton.clickButton(events):  # Check if the map button is clicked
-        map_ui_open = not map_ui_open  # Toggle the map UI state
 
-    if map_ui_open:  # Only draw the map UI if it's open
+    # Handle Q key for temporary map UI
+    if keys[pygame.K_q]:
+        map_ui_open_temp = True  # Temporary map UI when Q is held down
+        if not tempMapSound:
+            CLICK_SOUND.play()
+        tempMapSound = True
+    else:
+        map_ui_open_temp = False  # Close temporary map UI when Q is released
+        tempMapSound = False
+
+    # Handle map button click
+    if mapButton.clickButton(events):
+        map_ui_open = not map_ui_open  # Toggle map UI state
+
+    map_ui_display = map_ui_open or map_ui_open_temp
+
+    # Draw the map UI if it should be displayed
+    if map_ui_display:
         WIN.blit(MAPUI, (75, 75))  # Draw the map UI
         ButtonUIQuitButton.drawButton()
 
-        # Quit button for map UI
+        # Handle quit button click for the map UI
         if ButtonUIQuitButton.clickButton(events):
             map_ui_open = False  # Close the map UI
 
