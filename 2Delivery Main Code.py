@@ -434,6 +434,8 @@ while run:
         
         # Menu play button
         play_button.drawButton()
+
+
         if volumeBool:
             volumeOnButtonMenu.drawButton()
         else:
@@ -460,7 +462,8 @@ while run:
             pygame.mixer.music.play(-1, 0.0)
 
         # Check if play button is clicked
-        if play_button.clickButton(events):
+        if play_button.clickButton(events) or keys[pygame.K_SPACE]:
+
             gameInfo.start_game()
             if volumeBool:
                 pygame.mixer.music.stop()  # Stop menu music before starting game music
