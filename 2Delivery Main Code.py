@@ -265,7 +265,7 @@ class playerCar(AbstractCar):
         super().__init__(max_vel, rotation_vel, self.START_POS, acceleration)  # Pass START_POS to the parent class
 
     def bounce(self):
-        self.vel = -0.5*self.vel
+        self.vel = -self.vel
         self.move()
 
 def draw(win, images, player_car):
@@ -330,8 +330,12 @@ def payPlayer(playerMoney, deliveryLocation, carMultiplier):
         moneyGain = (2.5*randomNum)*carMultiplier
         playerMoney += moneyGain
     else:
-        moneyGain = (randomNum*1.5)*carMultiplier
+        moneyGain = (1.5*randomNum)*carMultiplier
         playerMoney += moneyGain
+
+    global coin_gain_text, coin_gain_time
+    coin_gain_text = str(int(moneyGain))
+    coin_gain_time = pygame.time.get_ticks()
     
     return playerMoney, moneyGain
 
@@ -403,7 +407,9 @@ wh_ui_open = False
 
 is_driving_sound_playing = False
 
-
+coin_gain_time = 0
+coin_gain_duration = 2500
+coin_gain_text = ""
 
 
 
@@ -754,7 +760,29 @@ while run:
             currentParcels.pop(0)  # Remove the delivered location from the list
             print("Delivered! Remaining parcels: " + str(currentParcels))
             COIN_GAIN_SOUND.play()
-        
+
+            current_time = pygame.time.get_ticks()
+            elapsed_time = current_time - coin_gain_time
+
+
+    current_time = pygame.time.get_ticks()
+    elapsed_time = current_time - coin_gain_time
+
+    if elapsed_time < coin_gain_duration:
+        # Calculate transparency (255 is fully opaque, 0 is fully transparent)
+        alpha = max(0, 255 - int((elapsed_time / coin_gain_duration) * 255))
+    
+        # Create a surface for the text
+        coin_gain_surface = PRICE_UI_FONT.render("+" + coin_gain_text, True, (20, 240, 80))  # Green text
+        coin_gain_surface.set_alpha(alpha)  # Set transparency
+
+        # Draw the text with the adjusted position
+        WIN.blit(coin_gain_surface, (1000 - coin_gain_surface.get_width() , 130))
+    else:
+        # Clear the text after 5 seconds
+        coin_gain_text = ""
+
+
     # Update display
     pygame.display.update()
 
