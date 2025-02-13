@@ -14,3 +14,5 @@ Controls
 - S = Reverse in the opposite direction your veichle is pointing.
 - A = Rotate veichle anticlockwise.
 - D = Rotate veichle clockwise.
+- Q = Open map while held down.
+- Space Bar = Starts game if your in menu.

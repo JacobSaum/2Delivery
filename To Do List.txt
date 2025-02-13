@@ -3,6 +3,5 @@
 --------------------
 
 - Add delivery animation
-- Money gain text pop up
-- update grey bg so it updates in same frame
+- Refill parcels sound
 - + not so much TONS more 

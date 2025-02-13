@@ -124,7 +124,7 @@ DRIVING_SOUND.set_volume(0.2)
 
 
 # --- UI GREY TRANSPARENT BG ---
-TRANSPARENT_GREY = pygame.Surface((1280, 1024), pygame.SRCALPHA)
+TRANSPARENT_GREY = pygame.Surface((1005, 1005), pygame.SRCALPHA)
 TRANSPARENT_GREY.fill((33, 33, 33, 170))  # Grey with 50% transparency
 
 WIN = pygame.display.set_mode((1280,1024))
@@ -379,7 +379,7 @@ menuHelpQuitButton = Button(965, 55, UIEXITBUTTON)
 # car shop buttons
 carShopQuitButton = Button(860, 200, UIEXITBUTTON)
 BuyButton = Button(500, 585, BUYBUTTON)
-GreyDrawButton = Button(500, 585, GREYBUYBUTTON)
+GreyBuyButton = Button(500, 585, GREYBUYBUTTON)
 
 #warehouse buttons
 warehouseQuitButton = Button(860, 200, UIEXITBUTTON)
@@ -562,10 +562,7 @@ while run:
     # --- DRAW BUTTONS ---
     helpButton.drawButton()
     mapButton.drawButton()
-
-    # --- UI GREY BG ---
-    if map_ui_open or map_ui_open_temp or help_ui_open or car_ui_open or wh_ui_open:
-        WIN.blit(TRANSPARENT_GREY, (0, 0))  # Draw the transparent grey surface
+        
 
     # --- MAP BUTTON ---
 
@@ -587,6 +584,7 @@ while run:
 
     # Draw the map UI if it should be displayed
     if map_ui_display:
+        WIN.blit(TRANSPARENT_GREY, (0, 0))  # Draw the transparent grey background behind UI
         WIN.blit(MAPUI, (75, 75))  # Draw the map UI
         ButtonUIQuitButton.drawButton()
 
@@ -600,6 +598,7 @@ while run:
         help_ui_open = not help_ui_open  # Toggle the map UI state
 
     if help_ui_open:  # Only draw the map UI if it's open
+        WIN.blit(TRANSPARENT_GREY, (0, 0))  # Draw the transparent grey background behind UI
         WIN.blit(HELPUI, (75, 75))  # Draw the map UI
         ButtonUIQuitButton.drawButton()
 
@@ -634,6 +633,7 @@ while run:
     # --- WAREHOUSE ---
     if current_location == "WH" and not warehouse_exited:
         print("Rendering Warehouse UI")  # Debug statement
+        WIN.blit(TRANSPARENT_GREY, (0, 0))  # Draw the transparent grey background behind UI
         WIN.blit(WAREHOUSEUI, (75, 225))  # Draw the warehouse UI
         warehouseQuitButton.drawButton()  # Draw the quit button
         parcelButton.drawButton()  # Draw the parcel button
@@ -662,6 +662,7 @@ while run:
 
     # --- CAR SHOP ---
     if current_location == "CS" and not car_shop_exited:
+        WIN.blit(TRANSPARENT_GREY, (0, 0))  # Draw the transparent grey background behind UI
         WIN.blit(CARSHOPUI, (75, 225))
         carShopQuitButton.drawButton()
         car_ui_open = True
@@ -711,8 +712,8 @@ while run:
 
                     car_shop_exited = True
             else:
-                GreyDrawButton.drawButton()  # Draw the greyed-out buy button if the player can't afford the car
-                if GreyDrawButton.clickButton(events):
+                GreyBuyButton.drawButton()  # Draw the greyed-out buy button if the player can't afford the car
+                if GreyBuyButton.clickButton(events):
                     # Play error sound
                     ERROR_SOUND.play()
 
