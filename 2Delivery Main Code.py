@@ -126,6 +126,8 @@ DRIVING_SOUND.set_volume(0.2)
 # --- UI GREY TRANSPARENT BG ---
 TRANSPARENT_GREY = pygame.Surface((1005, 1005), pygame.SRCALPHA)
 TRANSPARENT_GREY.fill((33, 33, 33, 170))  # Grey with 50% transparency
+TRANSPARENT_GREY_MENU = pygame.Surface((1280, 1024), pygame.SRCALPHA)
+TRANSPARENT_GREY_MENU.fill((33, 33, 33, 170))  # Grey with 50% transparency
 
 WIN = pygame.display.set_mode((1280,1024))
 pygame.display.set_caption("2Delivery")
@@ -439,6 +441,9 @@ while run:
             pygame.time.wait(250)
             run = False
             break
+        elif keys[pygame.K_ESCAPE]:
+            run = False
+            break
         
         # Menu play button
         play_button.drawButton()
@@ -455,6 +460,7 @@ while run:
             menuHelpButtonOpen = not menuHelpButtonOpen
         
         if menuHelpButtonOpen:
+            WIN.blit(TRANSPARENT_GREY_MENU, (0, 0))  # Draw the transparent grey background behind UI
             WIN.blit(HELPUI, (175, 75))  # Draw the help UI
             menuHelpQuitButton.drawButton()
 
@@ -541,9 +547,12 @@ while run:
     draw(WIN, images, player_car)
     quit_Button.drawButton()
 
-    # Quit button handling
+    # --- QUIT GAME ---
     if quit_Button.clickButton(events):
         pygame.time.wait(250)
+        run = False
+        break
+    elif keys[pygame.K_ESCAPE]:
         run = False
         break
 
