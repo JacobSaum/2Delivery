@@ -2,7 +2,7 @@
 2Delivery TO DO LIST
 --------------------
 
-- Fix Collision System 
 - Add delivery animation
-- Add toutorial button / ui
-- + TONS more 
+- Money gain text pop up
+- update grey bg so it updates in same frame
+- + not so much TONS more 

@@ -139,18 +139,21 @@ carMaxSpeeds=[]
 carCapacity = []
 CarDeliveryMultiplier = []
 carPrices = []
-
+carAccelerations = []
+carRotations = []
 
 carNumber = 0
 
 csv_file = open('CarStats.csv','r') 
 for line in csv_file:                  
-    name,speed,capacity,multiplier,price=line[:-1].split(',')  
+    name,speed,capacity,multiplier,price,accelerations,rotations=line[:-1].split(',')  
     carNames.append(name)
     carMaxSpeeds.append(float(speed))
     carCapacity.append(int(capacity))
     CarDeliveryMultiplier.append(float(multiplier))
     carPrices.append(int(price))
+    carAccelerations.append(float(accelerations))
+    carRotations.append(float(rotations))
 csv_file.close()  
 
 carImages = [MOPED, PICKUP, VAN, LORRY, SPORTSCAR]
@@ -201,14 +204,14 @@ class Button():
 
 
 class AbstractCar:
-    def __init__(self, max_vel, rotation_vel, start_pos):
+    def __init__(self, max_vel, rotation_vel, start_pos, acceleration):
         self.img = self.IMG
         self.max_vel = max_vel
         self.vel = 0
         self.rotation_vel = rotation_vel
         self.angle = 0
         self.x, self.y = start_pos 
-        self.acceleration = 0.05
+        self.acceleration = acceleration
         self.mask = pygame.mask.from_surface(self.img)  # Original mask
 
     def rotate(self, left=False, right=False):
@@ -254,15 +257,15 @@ class AbstractCar:
         self.move()
 
 class playerCar(AbstractCar):
-    def __init__(self, max_vel, rotation_vel, car_image):
+    def __init__(self, max_vel, rotation_vel, car_image, acceleration):
         self.IMG = car_image  # Set the car image dynamically
         self.START_POS = (648, 720)  # Define the starting position
         #self.START_POS = (80, 80) # TESTING
 
-        super().__init__(max_vel, rotation_vel, self.START_POS)  # Pass START_POS to the parent class
+        super().__init__(max_vel, rotation_vel, self.START_POS, acceleration)  # Pass START_POS to the parent class
 
     def bounce(self):
-        self.vel = -self.vel
+        self.vel = -0.5*self.vel
         self.move()
 
 def draw(win, images, player_car):
@@ -345,7 +348,7 @@ menuImages = [(MAINMENU, (0,0))]
 
 # -- PLAYER CAR --
 
-player_car = playerCar(carMaxSpeeds[carNumber], 2, carImages[carNumber])
+player_car = playerCar(carMaxSpeeds[carNumber], carRotations[carNumber], carImages[carNumber], carAccelerations[carNumber])
 gameInfo = GameInfo()
 
 
@@ -581,7 +584,7 @@ while run:
 
 
     # Redraw Text
-    coinsText = UI_FONT.render(str(round(playerCoins, 0)), False, (0, 0, 0))
+    coinsText = UI_FONT.render(str(int(playerCoins)), False, (0, 0, 0))
     WIN.blit(coinsText, (1120, 140))
 
     parcelsText = UI_FONT.render(str((len(currentParcels))) + " / " + str(carCapacity[carNumber]), False, (0, 0, 0))
@@ -600,7 +603,7 @@ while run:
     nextDeliveryLocationText2 = SMALL_UI_FONT.render("Location:", False, (0, 0, 0))
     WIN.blit(nextDeliveryLocationText2, (1120, 370))
 
-    speedText = SPEED_UI_FONT.render(str(round(player_car.vel*20, 1)) + "px/s", False, (0, 0, 0))
+    speedText = SPEED_UI_FONT.render(str(int(round(player_car.vel*20))) + "px/s", False, (0, 0, 0))
     WIN.blit(speedText, (1120, 485))
 
     # --- WAREHOUSE ---
@@ -674,7 +677,7 @@ while run:
                     carImage = carImages[carNumber]
 
                     # Create a new player car with the updated stats and image
-                    player_car = playerCar(carMaxSpeeds[carNumber], 2, carImages[carNumber])
+                    player_car = playerCar(carMaxSpeeds[carNumber], carRotations[carNumber], carImages[carNumber], carAccelerations[carNumber])
 
                     # Set the new car's position to the stored coordinates
                     player_car.x, player_car.y = current_x, current_y
