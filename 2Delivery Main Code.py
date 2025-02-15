@@ -1,18 +1,15 @@
 #------------------- IMPORTS -------------------
 
 import pygame
-import time
 import random
 import math
-import csv
 pygame.init()
 pygame.font.init()
 pygame.mixer.init()
 
-
-
 from Functions import scale_image
 from Functions import blit_rotate_centre
+from Functions import drawText
 
 #------------------- FILE LOADING -------------------
 
@@ -341,9 +338,7 @@ def payPlayer(playerMoney, deliveryLocation, carMultiplier):
     
     return playerMoney, moneyGain
 
-def drawText(text, font, colour, x, y):
-    text_surface = font.render(str(text), True, colour)  # Use `True` for antialiasing
-    WIN.blit(text_surface, (x, y))
+
 
 # -- CLOCK -- 
 
@@ -472,47 +467,50 @@ while run:
             if menuHelpQuitButton.clickButton(events):
                 menuHelpButtonOpen = False  # Close the help UI
 
-        
-
         # Menu Music
-        if not pygame.mixer.music.get_busy() and volumeBool:
-            pygame.mixer.music.load("sounds/Menu Music.mp3")
-            pygame.mixer.music.play(-1, 0.0)
+        if not pygame.mixer.music.get_busy() and volumeBool: # if music isnt alrealdy playing and volume is switched on
+            pygame.mixer.music.load("sounds/Menu Music.mp3") # load menu music
+            pygame.mixer.music.play(-1, 0.0) # play menu music on repeat
 
-        # Check if play button is clicked
-        if play_button.clickButton(events) or keys[pygame.K_SPACE]:
 
-            gameInfo.start_game()
-            if volumeBool:
+        if play_button.clickButton(events) or keys[pygame.K_SPACE]: # Check if play button is clicked
+
+            gameInfo.start_game() # Start game
+
+            # start game music when game started
+            if volumeBool: # If music is unmuted, load the game music and play
                 pygame.mixer.music.stop()  # Stop menu music before starting game music
-                pygame.mixer.music.load("sounds/Game Music.mp3")
-                pygame.mixer.music.play(-1, 0.0)
-            else:
-                # If music is muted, load the game music but keep it paused
-                pygame.mixer.music.stop()
-                pygame.mixer.music.load("sounds/Game Music.mp3")
-                pygame.mixer.music.play(-1, 0.0)
-                pygame.mixer.music.pause()
+                pygame.mixer.music.load("sounds/Game Music.mp3") # load game music
+                pygame.mixer.music.play(-1, 0.0) # play game music on repeat
+
+            else: # If music is muted, load the game music but keep it paused
+                pygame.mixer.music.stop() # Stop menu music
+                pygame.mixer.music.load("sounds/Game Music.mp3") # load game music
+                pygame.mixer.music.play(-1, 0.0) # play game music on repeat
+                pygame.mixer.music.pause() # pause game music
 
         # Volume button handling
-        if volumeBool and volumeOnButtonMenu.clickButton(events):
-            volumeBool = False
-            pygame.mixer.music.pause()
-        elif not volumeBool and volumeOffButtonMenu.clickButton(events):
-            volumeBool = True
-            pygame.mixer.music.unpause()
+        if volumeBool and volumeOnButtonMenu.clickButton(events): # if volume on and volume button clicked
+            volumeBool = False # turn volume off
+            pygame.mixer.music.pause() # pause music at current location
+        elif not volumeBool and volumeOffButtonMenu.clickButton(events):# if volume off and volume button clicked
+            volumeBool = True # turn volume on
+            pygame.mixer.music.unpause() # unpause music from its previous location
         
-        # Update Menu ONCE every frame
+        # Update Menu ONCE every MENU frame
         pygame.display.update()
 
         continue  # Skip game logic while in the menu
 
-    current_location = get_current_delivery_location(player_car)
-
     # Game logic begins after start
-    moved = False
 
-    # W Keybind
+    current_location = get_current_delivery_location(player_car) # gets the player's location
+
+    moved = False 
+
+    # ------ Keybinds ------
+
+    # - W Keybind -
     if keys[pygame.K_w]:
         if not keys[pygame.K_s]:  # Only move forward if S is not pressed
             player_car.move_forward()
@@ -522,7 +520,7 @@ while run:
                 is_driving_sound_playing = True
 
 
-    # S Keybind
+    # - S Keybind -
     if keys[pygame.K_s]:
         if not keys[pygame.K_w]:  # Only move backward if W is not pressed
             player_car.move_backward()
@@ -531,39 +529,45 @@ while run:
                 DRIVING_SOUND.play(-1)  # Loop the driving sound
                 is_driving_sound_playing = True
 
-    # A Keybind
+    # - A Keybind -
     if keys[pygame.K_a] and player_car.vel != 0:
-        player_car.rotate(left=True)
+        player_car.rotate(left=True) # turns car left
 
-    # D Keybind
+    # - D Keybind -
     if keys[pygame.K_d] and player_car.vel != 0:
-        player_car.rotate(right=True)
+        player_car.rotate(right=True) # turns car right
 
     # Gradually slowing stop for player car
-    if not moved:
-        player_car.reduce_speed()
+    if not moved: # if player isnt pressing w or s
+        player_car.reduce_speed() # slow car down
         if is_driving_sound_playing:
-            DRIVING_SOUND.stop()
+            DRIVING_SOUND.stop() # stop playing car engine sound
             is_driving_sound_playing = False
 
     # Check for collisions
-    if player_car.collide(MAP_COLLISIONS_MASK) is not None:
-        player_car.bounce()
+    if player_car.collide(MAP_COLLISIONS_MASK) is not None: # if playerCar colliding with collision map
+        player_car.bounce() # bounce player back
 
-    # Redraw screen
+    # Draw images and playerCar
     draw(WIN, images, player_car)
-    quit_Button.drawButton()
+    
+    
+    # ------ BUTTONS ------
 
-    # --- QUIT GAME ---
+    # - Quit Button (and esc to quit) - 
+    quit_Button.drawButton() # draw quit button
+
     if quit_Button.clickButton(events):
-        pygame.time.wait(250)
-        run = False
-        break
-    elif keys[pygame.K_ESCAPE]:
-        run = False
-        break
+        pygame.time.wait(250) # wait time for button sound to play
+        run = False # stop running game
+        break # skip game logic
 
-    # --- VOLUME MANAGEMENT CODE ---
+    elif keys[pygame.K_ESCAPE]: # alternatively, if esc key is pressed
+        run = False # stop running game
+        break # skip game logic
+
+
+    # -Volume Button - 
     if volumeBool:
         volumeOnButton.drawButton()
         if volumeOnButton.clickButton(events):
@@ -575,12 +579,25 @@ while run:
             volumeBool = True
             pygame.mixer.music.unpause()
 
-    # --- DRAW BUTTONS ---
-    helpButton.drawButton()
-    mapButton.drawButton()
-        
 
-    # --- MAP BUTTON ---
+    # - Help Button -
+    helpButton.drawButton()
+
+    if helpButton.clickButton(events):  # Check if the map button is clicked
+        help_ui_open = not help_ui_open  # Toggle the map UI state
+
+    if help_ui_open:  # Only draw the map UI if it's open
+        WIN.blit(TRANSPARENT_GREY, (0, 0))  # Draw the transparent grey background behind UI
+        WIN.blit(HELPUI, (75, 75))  # Draw the map UI
+        ButtonUIQuitButton.drawButton()
+
+        # Quit button for map UI
+        if ButtonUIQuitButton.clickButton(events):
+            help_ui_open = False  # Close the map UI
+
+
+    # - Map Button -
+    mapButton.drawButton()
 
     # Handle Q key for temporary map UI
     if keys[pygame.K_q]:
@@ -607,39 +624,25 @@ while run:
         # Handle quit button click for the map UI
         if ButtonUIQuitButton.clickButton(events):
             map_ui_open = False  # Close the map UI
-
-    # --- HELP BUTTON ---
     
-    if helpButton.clickButton(events):  # Check if the map button is clicked
-        help_ui_open = not help_ui_open  # Toggle the map UI state
-
-    if help_ui_open:  # Only draw the map UI if it's open
-        WIN.blit(TRANSPARENT_GREY, (0, 0))  # Draw the transparent grey background behind UI
-        WIN.blit(HELPUI, (75, 75))  # Draw the map UI
-        ButtonUIQuitButton.drawButton()
-
-        # Quit button for map UI
-        if ButtonUIQuitButton.clickButton(events):
-            help_ui_open = False  # Close the map UI
-
 
     # --- Redraw UI Text ---
-    drawText(str(int(playerCoins)), UI_FONT, (0,0,0), 1120, 140) # Draw player's current coins text
+    drawText(WIN, str(int(playerCoins)), UI_FONT, (0,0,0), 1120, 140) # Draw player's current coins text
 
-    drawText((str(len(currentParcels))) + " / " + str(carCapacity[carNumber]), UI_FONT, (0,0,0), 1120, 255) # draw current parcels text
+    drawText(WIN, str(len(currentParcels)) + " / " + str(carCapacity[carNumber]), UI_FONT, (0,0,0), 1120, 255) # draw current parcels text
 
-    drawText("Next Delivery", SMALL_UI_FONT, (0,0,0), 1120, 360) # Draw "next Delivery" text
+    drawText(WIN, "Next Delivery", SMALL_UI_FONT, (0,0,0), 1120, 360) # Draw "next Delivery" text
 
-    drawText("Location:", SMALL_UI_FONT, (0,0,0), 1120, 370) # Draw "Location" text
+    drawText(WIN, "Location:", SMALL_UI_FONT, (0,0,0), 1120, 370) # Draw "Location" text
 
-    drawText(str(int(player_car.vel*20)) + "px/s", SPEED_UI_FONT, (0,0,0), 1120, 485) # Draw veichle current speed text
+    drawText(WIN, str(int(player_car.vel*20)) + "px/s", SPEED_UI_FONT, (0,0,0), 1120, 485) # Draw veichle current speed text
 
     if currentParcels:
         deliveryLocationText = currentParcels[0] # set next deliery location to the next delivery's house code
     else:
         deliveryLocationText = "N/A" # set delivery location text to n/a if there isnt any parcels
 
-    drawText(deliveryLocationText, UI_FONT, (0,0,0), 1120, 382) # Draw next delivery location text
+    drawText(WIN, deliveryLocationText, UI_FONT, (0,0,0), 1120, 382) # Draw next delivery location text
 
     # --- Warehouse ---
     if current_location == "WH" and not warehouse_exited:
@@ -730,27 +733,27 @@ while run:
             capacityStats = "N/A"                     
             carMultiplierStats ="N/A"
             carNameStats = "N/A"
-            drawText("No Cars", PRICE_UI_FONT, (0,0,0), 480, 580)
-            drawText("Available To", PRICE_UI_FONT, (0,0,0), 400, 640)
-            drawText("Purchase!", PRICE_UI_FONT, (0,0,0), 440, 700)
+            drawText(WIN, "No Cars", PRICE_UI_FONT, (0,0,0), 480, 580)
+            drawText(WIN, "Available To", PRICE_UI_FONT, (0,0,0), 400, 640)
+            drawText(WIN, "Purchase!", PRICE_UI_FONT, (0,0,0), 440, 700)
 
         # Display Max Speed Stats
-        drawText("Max Speed", STATS_UI_FONT, (0,0,0), 140, 540)
-        drawText(speedStatsText, STATS_UI_FONT, (140, 25, 25), 140, 560)
+        drawText(WIN, "Max Speed", STATS_UI_FONT, (0,0,0), 140, 540)
+        drawText(WIN, speedStatsText, STATS_UI_FONT, (140, 25, 25), 140, 560)
 
         # Display Capacity Stats
-        drawText("Capacity", STATS_UI_FONT, (0,0,0), 140, 600)
-        drawText(capacityStats, STATS_UI_FONT, (140, 25, 25), 140, 620)
+        drawText(WIN, "Capacity", STATS_UI_FONT, (0,0,0), 140, 600)
+        drawText(WIN, capacityStats, STATS_UI_FONT, (140, 25, 25), 140, 620)
 
         # Display Car Multiplier Stats
-        drawText("Multiplier", STATS_UI_FONT, (0,0,0), 140, 660)
-        drawText(carMultiplierStats, STATS_UI_FONT,(140, 25, 25), 140, 680)
+        drawText(WIN, "Multiplier", STATS_UI_FONT, (0,0,0), 140, 660)
+        drawText(WIN, carMultiplierStats, STATS_UI_FONT,(140, 25, 25), 140, 680)
 
         # Display car name
-        drawText(carNameStats, LARGE_UI_FONT, (0,0,0), 380, 348)
+        drawText(WIN, carNameStats, LARGE_UI_FONT, (0,0,0), 380, 348)
 
         # Display car price
-        drawText(price_text, PRICE_UI_FONT, (0,0,0), 575, 467)
+        drawText(WIN, price_text, PRICE_UI_FONT, (0,0,0), 575, 467)
 
         if carShopQuitButton.clickButton(events):
             current_location = None

@@ -1,14 +1,14 @@
 import pygame
 
 
-#------------------- IMAGE SCALE FUNCTION -------------------
+#--- Image Scale Function ---
 
 def scale_image(img, factor):
     size = round(img.get_width() * factor), round(img.get_height() * factor)
     return pygame.transform.scale(img, size)
 
 
-#------------------- IMAGE ROTATE FUNCTION -------------------
+#--- Image Rotate Function ---
 
 def blit_rotate_centre(win, image, top_left, angle):
     # Rotate the image
@@ -23,3 +23,9 @@ def blit_rotate_centre(win, image, top_left, angle):
         win.blit(rotated_image, new_rect.topleft)
     
     return rotated_image, new_rect
+
+# --- Draw Text Sub-Program ---
+
+def drawText(win, text, font, colour, x, y):
+    text_surface = font.render(str(text), True, colour)  # Use `True` for antialiasing
+    win.blit(text_surface, (x, y))
