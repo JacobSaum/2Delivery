@@ -510,19 +510,22 @@ while run:
 
     # W Keybind
     if keys[pygame.K_w]:
-        player_car.move_forward()
-        moved = True
-        if not is_driving_sound_playing:
-            DRIVING_SOUND.play(-1)  # Loop the driving sound
-            is_driving_sound_playing = True
+        if not keys[pygame.K_s]:  # Only move forward if S is not pressed
+            player_car.move_forward()
+            moved = True
+            if not is_driving_sound_playing:
+                DRIVING_SOUND.play(-1)  # Loop the driving sound
+                is_driving_sound_playing = True
+
 
     # S Keybind
     if keys[pygame.K_s]:
-        player_car.move_backward()
-        moved = True
-        if not is_driving_sound_playing:
-            DRIVING_SOUND.play(-1)  # Loop the driving sound
-            is_driving_sound_playing = True
+        if not keys[pygame.K_w]:  # Only move backward if W is not pressed
+            player_car.move_backward()
+            moved = True
+            if not is_driving_sound_playing:
+                DRIVING_SOUND.play(-1)  # Loop the driving sound
+                is_driving_sound_playing = True
 
     # A Keybind
     if keys[pygame.K_a] and player_car.vel != 0:
