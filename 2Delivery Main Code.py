@@ -341,6 +341,10 @@ def payPlayer(playerMoney, deliveryLocation, carMultiplier):
     
     return playerMoney, moneyGain
 
+def drawText(text, font, colour, x, y):
+    text_surface = font.render(str(text), True, colour)  # Use `True` for antialiasing
+    WIN.blit(text_surface, (x, y))
+
 # -- CLOCK -- 
 
 FPS = 60
@@ -619,32 +623,26 @@ while run:
             help_ui_open = False  # Close the map UI
 
 
-    # Redraw Text
-    coinsText = UI_FONT.render(str(int(playerCoins)), False, (0, 0, 0))
-    WIN.blit(coinsText, (1120, 140))
+    # --- Redraw UI Text ---
+    drawText(str(int(playerCoins)), UI_FONT, (0,0,0), 1120, 140) # Draw player's current coins text
 
-    parcelsText = UI_FONT.render(str((len(currentParcels))) + " / " + str(carCapacity[carNumber]), False, (0, 0, 0))
-    WIN.blit(parcelsText, (1120, 255))
+    drawText((str(len(currentParcels))) + " / " + str(carCapacity[carNumber]), UI_FONT, (0,0,0), 1120, 255) # draw current parcels text
+
+    drawText("Next Delivery", SMALL_UI_FONT, (0,0,0), 1120, 360) # Draw "next Delivery" text
+
+    drawText("Location:", SMALL_UI_FONT, (0,0,0), 1120, 370) # Draw "Location" text
+
+    drawText(str(int(player_car.vel*20)) + "px/s", SPEED_UI_FONT, (0,0,0), 1120, 485) # Draw veichle current speed text
 
     if currentParcels:
-        deliveryLocationText = UI_FONT.render(currentParcels[0], False, (0, 0, 0))
+        deliveryLocationText = currentParcels[0] # set next deliery location to the next delivery's house code
     else:
-        deliveryLocationText = UI_FONT.render("N/A", False, (0, 0, 0))
+        deliveryLocationText = "N/A" # set delivery location text to n/a if there isnt any parcels
 
-    WIN.blit(deliveryLocationText, (1120, 382))  # Always display the text
+    drawText(deliveryLocationText, UI_FONT, (0,0,0), 1120, 382) # Draw next delivery location text
 
-    nextDeliveryLocationText1 = SMALL_UI_FONT.render("Next Delivery", False, (0, 0, 0))
-    WIN.blit(nextDeliveryLocationText1, (1120, 360))
-    
-    nextDeliveryLocationText2 = SMALL_UI_FONT.render("Location:", False, (0, 0, 0))
-    WIN.blit(nextDeliveryLocationText2, (1120, 370))
-
-    speedText = SPEED_UI_FONT.render(str(int(round(player_car.vel*20))) + "px/s", False, (0, 0, 0))
-    WIN.blit(speedText, (1120, 485))
-
-    # --- WAREHOUSE ---
+    # --- Warehouse ---
     if current_location == "WH" and not warehouse_exited:
-        print("Rendering Warehouse UI")  # Debug statement
         WIN.blit(TRANSPARENT_GREY, (0, 0))  # Draw the transparent grey background behind UI
         WIN.blit(WAREHOUSEUI, (75, 225))  # Draw the warehouse UI
         warehouseQuitButton.drawButton()  # Draw the quit button
@@ -683,18 +681,15 @@ while run:
         if carNumber < len(carPrices) - 1:  # Check if there is a next car to buy
             next_car_price = carPrices[carNumber + 1]  # Get the price of the next car
 
-            price_text = PRICE_UI_FONT.render(str(next_car_price), False, (0, 0, 0))
+            price_text = str(next_car_price)
 
-            speedStatsText = STATS_UI_FONT.render("Max Speed", False, (0, 0, 0))
-            speedStatsText2 = UI_FONT.render(str(carMaxSpeeds[carNumber + 1]*20) + "px/s", False, (140, 25, 25))
+            speedStatsText = str(carMaxSpeeds[carNumber + 1]*20) + "px/s"
 
-            capactiyStats = STATS_UI_FONT.render("Capacity", False, (0, 0, 0))
-            capacityStats2 = UI_FONT.render(str(carCapacity[carNumber + 1]), False, (140, 25, 25))
+            capacityStats = str(carCapacity[carNumber + 1])
 
-            carMultiplierStats = STATS_UI_FONT.render("Multiplier", False, (0, 0, 0))
-            carMultiplierStats2 = UI_FONT.render(str(CarDeliveryMultiplier[carNumber + 1]) + "x", False, (140, 25, 25))
+            carMultiplierStats = str(CarDeliveryMultiplier[carNumber + 1])
 
-            carnameStats = LARGE_UI_FONT.render(str(carNames[carNumber + 1]), False, (0, 0, 0))
+            carNameStats = str(carNames[carNumber + 1])
 
             if playerCoins >= next_car_price:
                 BuyButton.drawButton()
@@ -730,28 +725,32 @@ while run:
                     ERROR_SOUND.play()
 
         else:
-            price_text = PRICE_UI_FONT.render("N/A", False, (0, 0, 0))
-            speedStatsText2 = STATS_UI_FONT.render("N/A ", False, (140, 25, 25))
-            capacityStats2 = STATS_UI_FONT.render("N/A", False, (140, 25, 25))                      
-            carMultiplierStats2 = STATS_UI_FONT.render("N/A", False, (140, 25, 25))
-            carnameStats = LARGE_UI_FONT.render("N/A", False, (0, 0, 0))
-            WIN.blit((PRICE_UI_FONT.render("No Cars", False, (0, 0, 0))), (480, 580))
-            WIN.blit((PRICE_UI_FONT.render("Available To", False, (0, 0, 0))), (400, 640))
-            WIN.blit((PRICE_UI_FONT.render("Purchase!", False, (0, 0, 0))), (440, 700))
+            price_text = "N/A"
+            speedStatsText = "N/A "
+            capacityStats = "N/A"                     
+            carMultiplierStats ="N/A"
+            carNameStats = "N/A"
+            drawText("No Cars", PRICE_UI_FONT, (0,0,0), 480, 580)
+            drawText("Available To", PRICE_UI_FONT, (0,0,0), 400, 640)
+            drawText("Purchase!", PRICE_UI_FONT, (0,0,0), 440, 700)
 
         # Display Max Speed Stats
-        WIN.blit(speedStatsText, (140, 540))
-        WIN.blit(speedStatsText2, (140, 560))
+        drawText("Max Speed", STATS_UI_FONT, (0,0,0), 140, 540)
+        drawText(speedStatsText, STATS_UI_FONT, (140, 25, 25), 140, 560)
+
         # Display Capacity Stats
-        WIN.blit(capactiyStats, (140, 600))
-        WIN.blit(capacityStats2, (140, 620))
+        drawText("Capacity", STATS_UI_FONT, (0,0,0), 140, 600)
+        drawText(capacityStats, STATS_UI_FONT, (140, 25, 25), 140, 620)
+
         # Display Car Multiplier Stats
-        WIN.blit(carMultiplierStats, (140, 660))
-        WIN.blit(carMultiplierStats2, (140, 680))
+        drawText("Multiplier", STATS_UI_FONT, (0,0,0), 140, 660)
+        drawText(carMultiplierStats, STATS_UI_FONT,(140, 25, 25), 140, 680)
+
         # Display car name
-        WIN.blit(carnameStats, (380, 348))
+        drawText(carNameStats, LARGE_UI_FONT, (0,0,0), 380, 348)
+
         # Display car price
-        WIN.blit(price_text, (575, 467))
+        drawText(price_text, PRICE_UI_FONT, (0,0,0), 575, 467)
 
         if carShopQuitButton.clickButton(events):
             current_location = None
