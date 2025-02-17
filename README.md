@@ -1,5 +1,7 @@
 # 2Delivery
-Welcome to 2Delivery!
+Version 1.0
+
+Welcome to 2Delivery! 
 
 2Delivery is a singleplayer delivery game where you are a young person 
 who applies for a delivery job at the local delivery company, starting 

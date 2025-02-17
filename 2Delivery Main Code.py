@@ -126,7 +126,7 @@ TRANSPARENT_GREY.fill((33, 33, 33, 170))  # Grey with 50% transparency
 TRANSPARENT_GREY_MENU = pygame.Surface((1280, 1024), pygame.SRCALPHA)
 TRANSPARENT_GREY_MENU.fill((33, 33, 33, 170))  # Grey with 50% transparency
 
-WIN = pygame.display.set_mode((1280,1024))
+WIN = pygame.display.set_mode((1280,1000))
 pygame.display.set_caption("2Delivery")
 
 # ------------------- MAIN CODE -------------------
@@ -165,7 +165,7 @@ print(carPrices)
 
 # --- COINS SYSTEM --- 
 
-startingCoins = 5000
+startingCoins = 0
 
 playerCoins = startingCoins
 

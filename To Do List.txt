@@ -1,7 +1,0 @@
-
-2Delivery TO DO LIST
---------------------
-
-- Add delivery animation
-- Refill parcels sound
-- + not so much TONS more 
